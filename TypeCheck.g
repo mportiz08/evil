@@ -23,7 +23,7 @@ types
    ;
 
 declarations
-   :  ^(DECLS declaration*)  
+   :  ^(DECLS declaration)
    ;
 
 functions:
