@@ -1,0 +1,8 @@
+*.class
+*.pdf
+*antlr.generated*
+EvilLexer.java
+EvilParser.java
+TypeCheck.java
+TypeCheck.tokens
+Evil.tokens
