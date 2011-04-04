@@ -47,7 +47,7 @@ declaration
    ;
    
 id_list
-   : id*
+   : (idl = ID)+
    ;
 
 type
@@ -57,11 +57,11 @@ type
    ;
 
 id
-:
-;
+   : {System.out.println("id");}
+   ;
 
 function
-   :  ^(FUN id params return_type declarations statement_list)
+   :  ^(FUN id params ^(RETTYPE return_type) declarations statement_list)
    ;
    
 params
@@ -162,3 +162,4 @@ arguments
 arg_list
    :  ARGS
    |  ^(ARGS expression+)
+   ;
