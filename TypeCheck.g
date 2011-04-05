@@ -57,7 +57,7 @@ type
    ;
 
 id
-   : {System.out.println("id");}
+   : ^(ID {System.out.println("id");})
    ;
 
 function
