@@ -14,7 +14,7 @@ options
    import java.util.Iterator;
 }
 
-verify returns [String rtype = null]
+verify[HashMap<String,StructType> structtable, HashMap<String,Type> vartable] returns [String rtype = null]
    :  ^(PROGRAM types declarations functions)
    ;
 

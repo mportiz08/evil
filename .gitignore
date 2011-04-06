@@ -6,3 +6,5 @@ EvilParser.java
 TypeCheck.java
 TypeCheck.tokens
 Evil.tokens
+*~
+.DS_Store
