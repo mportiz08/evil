@@ -15,27 +15,27 @@ options
 }
 
 verify
-   :  ^(PROGRAM types {System.out.println("types");} declarations {System.out.println("decls");} functions {System.out.println("funs");})
+   :  ^(PROGRAM types declarations functions)
    ;
 
 types
-   :  ^(TYPES type_sub*)
+   :  ^(TYPES {System.out.println("types");} type_sub*)
    ;
 
 declarations
-   :  ^(DECLS declaration*)
+   :  ^(DECLS {System.out.println("decls");} declaration*)
    ;
 
 functions
-   :  ^(FUNCS function*)
+   :  ^(FUNCS {System.out.println("funcs");} function*)
    ;
 
 type_sub
-   :  ^(STRUCT id nested_decl)
+   :  ^(STRUCT {System.out.println("struct");} id nested_decl)
    ;
 
 decl
-   :  ^(DECL ^(TYPE type) id)
+   :  ^(DECL {System.out.println("decl");} ^(TYPE {System.out.println("type");} type) id)
    ;
 
 nested_decl
@@ -43,17 +43,17 @@ nested_decl
    ;
    
 declaration
-   :  ^(DECLLIST ^(TYPE type) id_list)
+   :  ^(DECLLIST {System.out.println("decllist");} ^(TYPE {System.out.println("type");} type) id_list)
    ;
    
 id_list
-   : (idl = ID)+
+   : id+
    ;
 
 type
-   :  INT
-   |  BOOL
-   |  ^(STRUCT id)
+   :  INT {System.out.println("int");}
+   |  BOOL {System.out.println("bool");}
+   |  ^(STRUCT {System.out.println("struct");} id)
    ;
 
 id
@@ -61,98 +61,98 @@ id
    ;
 
 function
-   :  ^(FUN id params ^(RETTYPE return_type) declarations statement_list)
+   :  ^(FUN {System.out.println("fun");} id params ^(RETTYPE {System.out.println("rettype");} return_type) declarations statement_list)
    ;
    
 params
-   :  ^(PARAMS decl*)
+   :  ^(PARAMS {System.out.println("params");} decl*)
    ;
 
 return_type
    :  type
-   |  VOID
+   |  VOID {System.out.println("void return");}
    ;
 
 statement_list
-   :  ^(STMTS statement*)
+   :  ^(STMTS {System.out.println("stmts");} statement*)
    ;
    
 statement
    :  block
-   |  (lvalue ASSIGN) => assignment
+   |  assignment
    |  print
    |  read
    |  conditional
    |  loop
    |  delete
    |  ret
-   |  (ID LPAREN) => invocation
+   |  invocation
    ;
    
 block
-   :  ^(BLOCK statement_list)
+   :  ^(BLOCK {System.out.println("block");} statement_list)
    ;
    
 assignment
-   :  ^(ASSIGN expression lvalue)
+   :  ^(ASSIGN {System.out.println("assign");} expression lvalue)
    ;
    
 print
-   :  ^(PRINT expression (ENDL)?)
+   :  ^(PRINT {System.out.println("print");} expression (ENDL {System.out.println("endl");})?)
    ;
    
 read
-   :  ^(READ lvalue)
+   :  ^(READ {System.out.println("read");} lvalue)
    ;
    
 conditional
-   :  ^(IF expression block (block)?)
+   :  ^(IF {System.out.println("if");} expression block (block)?)
    ;
    
 loop
-   :  ^(WHILE expression block expression)
+   :  ^(WHILE {System.out.println("while");} expression block expression)
    ;
-   
+ 
 delete
-   :  ^(DELETE expression)
+   :  ^(DELETE {System.out.println("delete");} expression)
    ;
    
 ret
-   : ^(RETURN (expression)?)
+   : ^(RETURN {System.out.println("ret");} (expression)?)
    ;
    
 invocation
-   :  ^(INVOKE id arguments)
+   :  ^(INVOKE {System.out.println("invoke");} id arguments)
    ;
    
 lvalue
    :  id
-   | ^(DOT lvalue id)
+   | ^(DOT {System.out.println("lvalue dot");} lvalue id)
    ;
    
 expression
-   : ^(AND expression expression)
-   | ^(OR expression expression)
-   | ^(EQ expression expression)
-   | ^(LT expression expression)
-   | ^(GT expression expression)
-   | ^(NE expression expression)
-   | ^(LE expression expression)
-   | ^(GE expression expression)
-   | ^(PLUS expression expression)
-   | ^(MINUS expression expression)
-   | ^(TIMES expression expression)
-   | ^(DIVIDE expression expression)
-   | ^(NOT expression)
-   | ^(NEG expression)
-   | ^(DOT expression expression)
-   | ^(INVOKE id arguments)
-   |  ID
-   |  INTEGER
-   |  TRUE
-   |  FALSE
-   |  ^(NEW id)
-   |  NULL
+   : ^(AND {System.out.println("random expression");} expression expression)
+   | ^(OR {System.out.println("random expression");} expression expression)
+   | ^(EQ {System.out.println("random expression");} expression expression)
+   | ^(LT {System.out.println("random expression");} expression expression)
+   | ^(GT {System.out.println("random expression");} expression expression)
+   | ^(NE {System.out.println("random expression");} expression expression)
+   | ^(LE {System.out.println("random expression");} expression expression)
+   | ^(GE {System.out.println("random expression");} expression expression)
+   | ^(PLUS {System.out.println("random expression");} expression expression)
+   | ^(MINUS {System.out.println("random expression");} expression expression)
+   | ^(TIMES {System.out.println("random expression");} expression expression)
+   | ^(DIVIDE {System.out.println("random expression");} expression expression)
+   | ^(NOT {System.out.println("random expression");} expression)
+   | ^(NEG {System.out.println("random expression");} expression)
+   | ^(DOT {System.out.println("random expression");} expression expression)
+   | ^(INVOKE {System.out.println("random expression");} id arguments)
+   |  ID {System.out.println("random expression");}
+   |  INTEGER {System.out.println("random expression");}
+   |  TRUE {System.out.println("random expression");}
+   |  FALSE {System.out.println("random expression");}
+   |  ^(NEW {System.out.println("random expression");} id)
+   |  NULL {System.out.println("random expression");}
    ;
    
 arguments
@@ -161,5 +161,5 @@ arguments
    
 arg_list
    :  ARGS
-   |  ^(ARGS expression+)
+   |  ^(ARGS {System.out.println("args");} expression+)
    ;
