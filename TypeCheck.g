@@ -14,7 +14,7 @@ options
    import java.util.Iterator;
 }
 
-verify[HashMap<String,StructType> structtable, HashMap<String,Type> vartable] returns [String rtype = null]
+verify[HashMap<String,StructType> structtable, HashMap<String,Type> vartable] returns [Type rtype = null]
    :  ^(PROGRAM types declarations functions)
    ;
 
@@ -64,20 +64,20 @@ function returns [String name  = null]
    :  ^(FUN {System.out.println("fun");} id params ^(RETTYPE {System.out.println("rettype");} return_type) declarations statement_list)
    ;
    
-params returns [String rtype = null]
+params returns [Type rtype = null]
    :  ^(PARAMS {System.out.println("params");} decl*)
    ;
 
-return_type returns [String rtype = null]
+return_type returns [Type rtype = null]
    :  type
    |  VOID {System.out.println("void rtype");}
    ;
 
-statement_list returns [String rtype = null]
+statement_list returns [Type rtype = null]
    :  ^(STMTS {System.out.println("stmts");} statement*)
    ;
    
-statement returns [String rtype = null]
+statement returns [Type rtype = null]
    :  block
    |  assignment
    |  print
@@ -89,49 +89,59 @@ statement returns [String rtype = null]
    |  invocation
    ;
    
-block returns [String rtype = null]
+block returns [Type rtype = null]
    :  ^(BLOCK {System.out.println("block");} statement_list)
    ;
    
-assignment returns [String rtype = null]
+assignment returns [Type rtype = null]
    :  ^(ASSIGN {System.out.println("assign");} expression lvalue)
    ;
    
-print returns [String rtype = null]
+print returns [Type rtype = null]
    :  ^(PRINT {System.out.println("print");} expression (ENDL {System.out.println("endl");})?)
    ;
    
-read returns [String rtype = null]
+read returns [Type rtype = null]
    :  ^(READ {System.out.println("read");} lvalue)
    ;
    
-conditional returns [String rtype = null]
+conditional returns [Type rtype = null]
    :  ^(IF {System.out.println("if");} expression block (block)?)
    ;
    
-loop returns [String rtype = null]
+loop returns [Type rtype = null]
    :  ^(WHILE {System.out.println("while");} expression block expression)
    ;
  
-delete returns [String rtype = null]
+delete returns [Type rtype = null]
    :  ^(DELETE {System.out.println("delete");} expression)
    ;
    
-ret returns [String rtype = null]
+ret returns [Type rtype = null]
    : ^(RETURN {System.out.println("ret");} (expression)?)
    ;
    
-invocation returns [String rtype = null]
+invocation returns [Type rtype = null]
    :  ^(INVOKE {System.out.println("invoke");} id arguments)
    ;
    
-lvalue returns [String rtype = null]
+lvalue returns [Type rtype = null]
    :  id
    | ^(DOT {System.out.println("lvalue dot");} lvalue id)
    ;
    
-expression returns [String rtype = null]
-   : ^(AND {System.out.println("random expression");} expression expression){/*l.equals(r);*/}
+expression returns [Type rtype = null]
+   : ^(tnode=AND {System.out.println("random expression");} lv = expression rv = expression
+        {
+          if(!$lv.rtype.isBool())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type bool.");
+          }
+          if(!$rv.rtype.isBool())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type bool.");
+          }
+        })
    | ^(OR {System.out.println("random expression");} expression expression)
    | ^(EQ {System.out.println("random expression");} expression expression)
    | ^(LT {System.out.println("random expression");} expression expression)
@@ -148,18 +158,18 @@ expression returns [String rtype = null]
    | ^(DOT {System.out.println("random expression");} expression expression)
    | ^(INVOKE {System.out.println("random expression");} id arguments)
    |  ID {System.out.println("random expression");}
-   |  INTEGER {System.out.println("random expression");}
-   |  TRUE {System.out.println("random expression");}
-   |  FALSE {System.out.println("random expression");}
+   |  INTEGER {System.out.println("random expression"); $rtype = new IntType(); }
+   |  TRUE {System.out.println("random expression"); $rtype = new BoolType();}
+   |  FALSE {System.out.println("random expression"); $rtype = new BoolType(); }
    |  ^(NEW {System.out.println("random expression");} id)
    |  NULL {System.out.println("random expression");}
    ;
    
-arguments returns [String rtype = null]
+arguments returns [Type rtype = null]
    :  arg_list
    ;
    
-arg_list returns [String rtype = null]
+arg_list returns [Type rtype = null]
    :  ARGS
    |  ^(ARGS {System.out.println("args");} expression+)
    ;
