@@ -5,7 +5,7 @@ fun foo(int i) int      # standard case
 
 fun bar(int i) int      # control flow case
 {
-   if (true && 0)
+   if (false && true)
    {
       return 1;
    }

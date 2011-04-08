@@ -142,19 +142,154 @@ expression returns [Type rtype = null]
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type bool.");
           }
         })
-   | ^(OR {System.out.println("random expression");} expression expression)
-   | ^(EQ {System.out.println("random expression");} expression expression)
-   | ^(LT {System.out.println("random expression");} expression expression)
-   | ^(GT {System.out.println("random expression");} expression expression)
-   | ^(NE {System.out.println("random expression");} expression expression)
-   | ^(LE {System.out.println("random expression");} expression expression)
-   | ^(GE {System.out.println("random expression");} expression expression)
-   | ^(PLUS {System.out.println("random expression");} expression expression)
-   | ^(MINUS {System.out.println("random expression");} expression expression)
-   | ^(TIMES {System.out.println("random expression");} expression expression)
-   | ^(DIVIDE {System.out.println("random expression");} expression expression)
-   | ^(NOT {System.out.println("random expression");} expression)
-   | ^(NEG {System.out.println("random expression");} expression)
+   | ^(tnode=OR {System.out.println("random expression");} lv = expression rv = expression
+        {
+          if(!$lv.rtype.isBool())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type bool.");
+          }
+          if(!$rv.rtype.isBool())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type bool.");
+          }
+        }
+      )
+   | ^(tnode=EQ {System.out.println("random expression");} lv=expression rv=expression
+        {
+          if($lv.rtype.isBool())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type [int, struct].");
+          }
+          if($rv.rtype.isBool())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type [int, struct].");
+          }
+        }
+      )
+   | ^(tnode=LT {System.out.println("random expression");} lv=expression rv=expression
+        {
+          if(!$lv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type int.");
+          }
+          if(!$rv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
+          }
+        }
+      )
+   | ^(tnode=GT {System.out.println("random expression");} lv=expression rv=expression
+        {
+          if(!$lv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type int.");
+          }
+          if(!$rv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
+          }
+        }
+      )
+   | ^(tnode=NE {System.out.println("random expression");} lv=expression rv=expression
+        {
+          if($lv.rtype.isBool())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type [int, struct].");
+          }
+          if($rv.rtype.isBool())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type [int, struct].");
+          }
+        }
+      )
+   | ^(tnode=LE {System.out.println("random expression");} lv=expression rv=expression
+        {
+          if(!$lv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type int.");
+          }
+          if(!$rv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
+          }
+        }
+      )
+   | ^(tnode=GE {System.out.println("random expression");} lv=expression rv=expression
+        {
+          if(!$lv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type int.");
+          }
+          if(!$rv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
+          }
+        }
+      )
+   | ^(tnode=PLUS {System.out.println("random expression");} lv=expression rv=expression
+        {
+          if(!$lv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type int.");
+          }
+          if(!$rv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
+          }
+        }
+      )
+   | ^(tnode=MINUS {System.out.println("random expression");} lv=expression rv=expression
+        {
+          if(!$lv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type int.");
+          }
+          if(!$rv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
+          }
+        }
+      )
+   | ^(tnode=TIMES {System.out.println("random expression");} lv=expression rv=expression
+        {
+          if(!$lv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type int.");
+          }
+          if(!$rv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
+          }
+        }
+      )
+   | ^(tnode=DIVIDE {System.out.println("random expression");} lv=expression rv=expression
+        {
+          if(!$lv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type int.");
+          }
+          if(!$rv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
+          }
+        }
+      )
+   | ^(tnode=NOT {System.out.println("random expression");} uv=expression
+        {
+          if(!$uv.rtype.isBool())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $uv.text + " is not of type bool.");
+          }
+        }
+      )
+   | ^(tnode=NEG {System.out.println("random expression");} uv=expression
+        {
+          if(!$uv.rtype.isInt())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $uv.text + " is not of type int.");
+          }
+        }
+      )
    | ^(DOT {System.out.println("random expression");} expression expression)
    | ^(INVOKE {System.out.println("random expression");} id arguments)
    |  ID {System.out.println("random expression");}
