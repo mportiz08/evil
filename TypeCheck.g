@@ -156,11 +156,11 @@ expression returns [Type rtype = null]
       )
    | ^(tnode=EQ {System.out.println("random expression");} lv=expression rv=expression
         {
-          if($lv.rtype.isBool())
+          if(!$lv.rtype.isInt() || !$lv.rtype.isStruct())
           {
             EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type [int, struct].");
           }
-          if($rv.rtype.isBool())
+          if(!$rv.rtype.isInt() || !$rv.rtype.isStruct())
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type [int, struct].");
           }
@@ -192,11 +192,11 @@ expression returns [Type rtype = null]
       )
    | ^(tnode=NE {System.out.println("random expression");} lv=expression rv=expression
         {
-          if($lv.rtype.isBool())
+          if(!$lv.rtype.isInt() || !$lv.rtype.isStruct())
           {
             EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type [int, struct].");
           }
-          if($rv.rtype.isBool())
+          if(!$rv.rtype.isInt() || !$rv.rtype.isStruct())
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type [int, struct].");
           }
