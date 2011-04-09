@@ -98,7 +98,14 @@ assignment returns [Type rtype = null]
    ;
    
 print returns [Type rtype = null]
-   :  ^(PRINT {System.out.println("print");} expression (ENDL {System.out.println("endl");})?)
+   :  ^(tnode=PRINT {System.out.println("print");} uv=expression (ENDL {System.out.println("endl");})?
+         {
+           if(!$uv.rtype.isInt())
+           {
+             EvilUtil.die("line " + $tnode.line + ": " + $uv.text + " is not of type int.");
+           }
+         }
+       )
    ;
    
 read returns [Type rtype = null]
@@ -141,6 +148,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type bool.");
           }
+          $rtype = new BoolType();
         })
    | ^(tnode=OR {System.out.println("random expression");} lv = expression rv = expression
         {
@@ -152,6 +160,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type bool.");
           }
+          $rtype = new BoolType();
         }
       )
    | ^(tnode=EQ {System.out.println("random expression");} lv=expression rv=expression
@@ -164,6 +173,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type [int, struct].");
           }
+          $rtype = new BoolType();
         }
       )
    | ^(tnode=LT {System.out.println("random expression");} lv=expression rv=expression
@@ -176,6 +186,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
           }
+          $rtype = new BoolType();
         }
       )
    | ^(tnode=GT {System.out.println("random expression");} lv=expression rv=expression
@@ -188,6 +199,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
           }
+          $rtype = new BoolType();
         }
       )
    | ^(tnode=NE {System.out.println("random expression");} lv=expression rv=expression
@@ -200,6 +212,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type [int, struct].");
           }
+          $rtype = new BoolType();
         }
       )
    | ^(tnode=LE {System.out.println("random expression");} lv=expression rv=expression
@@ -212,6 +225,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
           }
+          $rtype = new BoolType();
         }
       )
    | ^(tnode=GE {System.out.println("random expression");} lv=expression rv=expression
@@ -224,6 +238,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
           }
+          $rtype = new BoolType();
         }
       )
    | ^(tnode=PLUS {System.out.println("random expression");} lv=expression rv=expression
@@ -236,6 +251,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
           }
+          $rtype = new IntType();
         }
       )
    | ^(tnode=MINUS {System.out.println("random expression");} lv=expression rv=expression
@@ -248,6 +264,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
           }
+          $rtype = new IntType();
         }
       )
    | ^(tnode=TIMES {System.out.println("random expression");} lv=expression rv=expression
@@ -260,6 +277,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
           }
+          $rtype = new IntType();
         }
       )
    | ^(tnode=DIVIDE {System.out.println("random expression");} lv=expression rv=expression
@@ -272,6 +290,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type int.");
           }
+          $rtype = new IntType();
         }
       )
    | ^(tnode=NOT {System.out.println("random expression");} uv=expression
@@ -280,6 +299,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $uv.text + " is not of type bool.");
           }
+          $rtype = new BoolType();
         }
       )
    | ^(tnode=NEG {System.out.println("random expression");} uv=expression
@@ -288,6 +308,7 @@ expression returns [Type rtype = null]
           {
             EvilUtil.die("line " + $tnode.line + ": " + $uv.text + " is not of type int.");
           }
+          $rtype = new IntType();
         }
       )
    | ^(DOT {System.out.println("random expression");} expression expression)
@@ -303,8 +324,8 @@ expression returns [Type rtype = null]
    |  INTEGER {System.out.println("random expression"); $rtype = new IntType(); }
    |  TRUE {System.out.println("random expression"); $rtype = new BoolType();}
    |  FALSE {System.out.println("random expression"); $rtype = new BoolType(); }
-   |  ^(NEW {System.out.println("random expression");} id)
-   |  NULL {System.out.println("random expression");}
+   |  ^(NEW {System.out.println("random expression");} id {$rtype = new StructType();})
+   |  NULL {System.out.println("random expression"); $rtype = new Type();}
    ;
    
 arguments returns [Type rtype = null]
