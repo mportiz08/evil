@@ -32,7 +32,7 @@ functions[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
 
 type_sub[HashMap<String,StructType> structtable]
    :  ^(STRUCT {System.out.println("struct");} rid=id 
-        filledStruct = nested_decl[new StructType()]
+        filledStruct = nested_decl[structtable,new StructType()]
            {
             if($structtable.containsKey($rid.rstring)){
                EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring  + " is already declared");
@@ -42,14 +42,14 @@ type_sub[HashMap<String,StructType> structtable]
         )
    ;
 
-decl returns [Type rtype = null, String rid = null, int linenumber = 0]
+decl [HashMap<String,StructType> structtable] returns [Type rtype = null, String rid = null, int linenumber = 0]
    :  ^(DECL {System.out.println("decl");} 
-       ^(TYPE {System.out.println("type");} rrtype = type{$rtype = $rrtype.rtype;}) 
+       ^(TYPE {System.out.println("type");} rrtype = type[structtable]{$rtype = $rrtype.rtype;}) 
        rrid = id{$rid = $rrid.rstring; $linenumber = $rrid.linenumber;})
    ;
 
-nested_decl[StructType inf] returns [StructType fs]
-   :  (rdecl=decl
+nested_decl[HashMap<String,StructType> structtable, StructType inf] returns [StructType fs]
+   :  (rdecl=decl[structtable]
         {
           if($inf.types.containsKey($rdecl.rid)){
              EvilUtil.die("line " + $rdecl.linenumber + ": " + $rdecl.rid  + " is already declared");
@@ -60,7 +60,7 @@ nested_decl[StructType inf] returns [StructType fs]
    ;
    
 declaration[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
-   :  ^(DECLLIST {System.out.println("decllist");} ^(TYPE {System.out.println("type");} dtype=type) id_list[structtable,vartable,dtype])
+   :  ^(DECLLIST {System.out.println("decllist");} ^(TYPE {System.out.println("type");} dtype=type[structtable]) id_list[structtable,vartable,dtype])
    ;
    
 id_list[HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type dtype]
@@ -74,10 +74,15 @@ id_list[HashMap<String,StructType> structtable, HashMap<String,Type> vartable, T
       )+
    ;
 
-type returns [Type rtype = null]
+type[HashMap<String,StructType> structtable] returns [Type rtype = null]
    :  INT {System.out.println("int"); $rtype = new IntType();}
    |  BOOL {System.out.println("bool"); $rtype = new BoolType();}
-   |  ^(STRUCT {System.out.println("struct"); $rtype = new IntType();} id)
+   |  ^(STRUCT {System.out.println("struct2"); $rtype = new IntType();} testid = id
+         {
+           if(!$structtable.containsKey($testid.rstring)){
+              EvilUtil.die("line " + $testid.linenumber + ": struct " + $testid.rstring  + " does not exist");
+           }
+         })
    ;
 
 id returns [String rstring = null, int linenumber = 0]
@@ -85,15 +90,15 @@ id returns [String rstring = null, int linenumber = 0]
    ;
 
 function[HashMap<String,StructType> structtable, HashMap<String,Type> vartable] returns [String name  = null]
-   :  ^(FUN {System.out.println("fun");} id params ^(RETTYPE {System.out.println("rettype");} return_type) declarations[structtable,vartable] statement_list)
+   :  ^(FUN {System.out.println("fun");} id params[structtable] ^(RETTYPE {System.out.println("rettype");} return_type[structtable]) declarations[structtable,vartable] statement_list)
    ;
    
-params returns [Type rtype = null]
-   :  ^(PARAMS {System.out.println("params");} decl*)
+params[HashMap<String,StructType> structtable] returns [Type rtype = null]
+   :  ^(PARAMS {System.out.println("params");} (decl[structtable])*)
    ;
 
-return_type returns [Type rtype = null]
-   :  type
+return_type[HashMap<String,StructType> structtable] returns [Type rtype = null]
+   :  type[structtable]
    |  VOID {System.out.println("void rtype");}
    ;
 
