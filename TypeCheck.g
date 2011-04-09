@@ -31,14 +31,14 @@ functions[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
    ;
 
 type_sub[HashMap<String,StructType> structtable]
-   :  ^(STRUCT {System.out.println("struct");} rid=id 
-        filledStruct = nested_decl[structtable,new StructType()]
-           {
-            if($structtable.containsKey($rid.rstring)){
+   :  ^(STRUCT {System.out.println("struct");} rid=id
+        {
+          if($structtable.containsKey($rid.rstring)){
                EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring  + " is already declared");
             }
-            $structtable.put($rid.rstring,$filledStruct.fs);
-          }
+          $structtable.put($rid.rstring, new StructType());
+        }
+        filledStruct = nested_decl[structtable,new StructType()]{$structtable.put($rid.rstring,$filledStruct.fs);}
         )
    ;
 

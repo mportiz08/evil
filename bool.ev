@@ -2,7 +2,7 @@ struct Tree
 {
    int i;
    bool b;
-   struct Tree t;
+   struct Rree t;
 };
 
 int a, b, c;
