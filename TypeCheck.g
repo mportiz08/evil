@@ -14,20 +14,20 @@ options
    import java.util.Iterator;
 }
 
-verify[HashMap<String,StructType> structtable, HashMap<String,Type> vartable] returns [Type rtype = null]
-   :  ^(PROGRAM types declarations functions)
+verify[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
+   :  ^(PROGRAM types declarations[structtable, vartable] functions[structtable, vartable])
    ;
 
 types
    :  ^(TYPES {System.out.println("types");} type_sub*)
    ;
 
-declarations
-   :  ^(DECLS {System.out.println("decls");} declaration*)
+declarations[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
+   :  ^(DECLS {System.out.println("decls");} (declaration[structtable,vartable])*)
    ;
 
-functions
-   :  ^(FUNCS {System.out.println("funcs");} function*)
+functions[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
+   :  ^(FUNCS {System.out.println("funcs");} (function[structtable, vartable])*)
    ;
 
 type_sub
@@ -42,26 +42,26 @@ nested_decl
    :  decl+
    ;
    
-declaration
-   :  ^(DECLLIST {System.out.println("decllist");} ^(TYPE {System.out.println("type");} type) id_list)
+declaration[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
+   :  ^(DECLLIST {System.out.println("decllist");} ^(TYPE {System.out.println("type");} dtype=type) id_list[structtable,vartable,dtype])
    ;
    
-id_list
-   : id+
+id_list[HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type dtype]
+   : (rid=id{$vartable.put($rid.rstring,$dtype);})+
    ;
 
-type
-   :  INT {System.out.println("int");}
-   |  BOOL {System.out.println("bool");}
-   |  ^(STRUCT {System.out.println("struct");} id)
+type returns [Type rtype = null]
+   :  INT {System.out.println("int"); $rtype = new IntType();}
+   |  BOOL {System.out.println("bool"); $rtype = new BoolType();}
+   |  ^(STRUCT {System.out.println("struct"); $rtype = new IntType();} id)
    ;
 
-id
-   : ^(ID {System.out.println("id");})
+id returns [String rstring = null]
+   : ^(tnode=ID {System.out.println("id"); $rstring = $tnode.text;})
    ;
 
-function returns [String name  = null]
-   :  ^(FUN {System.out.println("fun");} id params ^(RETTYPE {System.out.println("rettype");} return_type) declarations statement_list)
+function[HashMap<String,StructType> structtable, HashMap<String,Type> vartable] returns [String name  = null]
+   :  ^(FUN {System.out.println("fun");} id params ^(RETTYPE {System.out.println("rettype");} return_type) declarations[structtable,vartable] statement_list)
    ;
    
 params returns [Type rtype = null]
