@@ -291,7 +291,14 @@ expression returns [Type rtype = null]
         }
       )
    | ^(DOT {System.out.println("random expression");} expression expression)
-   | ^(INVOKE {System.out.println("random expression");} id arguments)
+   | ^(tnode=INVOKE {System.out.println("random expression");} lv=expression args=arguments
+        {
+          if(!$lv.rtype.isFunc())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not a function.");
+          }
+        }
+      )
    |  ID {System.out.println("random expression");}
    |  INTEGER {System.out.println("random expression"); $rtype = new IntType(); }
    |  TRUE {System.out.println("random expression"); $rtype = new BoolType();}
