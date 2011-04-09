@@ -1,3 +1,6 @@
+int a;
+int a;
+
 fun foo(int i) int      # standard case
 {
    return i;

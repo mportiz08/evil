@@ -47,7 +47,14 @@ declaration[HashMap<String,StructType> structtable, HashMap<String,Type> vartabl
    ;
    
 id_list[HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type dtype]
-   : (rid=id{$vartable.put($rid.rstring,$dtype);})+
+   : (rid=id
+        {
+          if($vartable.containsKey($rid.rstring)){
+             EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring  + " is already declared");
+          }
+          $vartable.put($rid.rstring,$dtype);
+        }
+      )+
    ;
 
 type returns [Type rtype = null]
@@ -56,8 +63,8 @@ type returns [Type rtype = null]
    |  ^(STRUCT {System.out.println("struct"); $rtype = new IntType();} id)
    ;
 
-id returns [String rstring = null]
-   : ^(tnode=ID {System.out.println("id"); $rstring = $tnode.text;})
+id returns [String rstring = null, int linenumber = 0]
+   : ^(tnode=ID {System.out.println("id"); $rstring = $tnode.text; $linenumber = $tnode.line;})
    ;
 
 function[HashMap<String,StructType> structtable, HashMap<String,Type> vartable] returns [String name  = null]
