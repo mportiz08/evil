@@ -1,10 +1,10 @@
-import java.util.HashMap;
+import java.util.ArrayList;
 
 public class FuncType extends Type
 {
-  public HashMap<String, Type> params;
+  public ArrayList<Type> params;
   public FuncType()
   {
-    params = new HashMap<String, Type>();
+    params = new ArrayList<Type>();
   }
 }

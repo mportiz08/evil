@@ -15,11 +15,11 @@ options
 }
 
 verify[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
-   :  ^(PROGRAM types declarations[structtable, vartable] functions[structtable, vartable])
+   :  ^(PROGRAM types[structtable] declarations[structtable, vartable] functions[structtable, vartable])
    ;
 
-types
-   :  ^(TYPES {System.out.println("types");} type_sub*)
+types[HashMap<String,StructType> structtable]
+   :  ^(TYPES {System.out.println("types");} (type_sub[structtable])*)
    ;
 
 declarations[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
@@ -30,16 +30,33 @@ functions[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
    :  ^(FUNCS {System.out.println("funcs");} (function[structtable, vartable])*)
    ;
 
-type_sub
-   :  ^(STRUCT {System.out.println("struct");} id nested_decl)
+type_sub[HashMap<String,StructType> structtable]
+   :  ^(STRUCT {System.out.println("struct");} rid=id 
+        filledStruct = nested_decl[new StructType()]
+           {
+            if($structtable.containsKey($rid.rstring)){
+               EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring  + " is already declared");
+            }
+            $structtable.put($rid.rstring,$filledStruct.fs);
+          }
+        )
    ;
 
-decl
-   :  ^(DECL {System.out.println("decl");} ^(TYPE {System.out.println("type");} type) id)
+decl returns [Type rtype = null, String rid = null, int linenumber = 0]
+   :  ^(DECL {System.out.println("decl");} 
+       ^(TYPE {System.out.println("type");} rrtype = type{$rtype = $rrtype.rtype;}) 
+       rrid = id{$rid = $rrid.rstring; $linenumber = $rrid.linenumber;})
    ;
 
-nested_decl
-   :  decl+
+nested_decl[StructType inf] returns [StructType fs]
+   :  (rdecl=decl
+        {
+          if($inf.types.containsKey($rdecl.rid)){
+             EvilUtil.die("line " + $rdecl.linenumber + ": " + $rdecl.rid  + " is already declared");
+          }
+          $inf.types.put($rdecl.rid,$rdecl.rtype);
+        }
+      )+
    ;
    
 declaration[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]

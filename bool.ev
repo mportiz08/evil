@@ -1,5 +1,12 @@
-int a;
-int a;
+struct Tree
+{
+   int i;
+   bool b;
+   struct Rree t;
+};
+
+int a, b, c;
+bool d, e, f;
 
 fun foo(int i) int      # standard case
 {
