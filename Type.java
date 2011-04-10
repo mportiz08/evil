@@ -1,6 +1,6 @@
 public class Type
 {
-  public boolean global;
+  public boolean global = false;
   public boolean isInt()
   {
     return this instanceof IntType;

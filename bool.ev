@@ -5,12 +5,29 @@ struct Tree
    struct Tree t;
 };
 
+struct Tree2
+{
+   int i; 
+   bool b;
+   struct Tree t;
+};
+
+struct Tree abc;
+struct Tree2 def;
+
 int a, b, c;
 bool d, e, f;
 
-fun foo(bool a, int a) bool      # standard case
+fun foo(bool c, struct Tree a) struct Tree      # standard case
 {
    int b;
+   b = 3;
+   print b;
+   a.i = b;
+   b = b + 3;
+   if(b != 3){
+     return a;
+   }
    return a;
 }
 

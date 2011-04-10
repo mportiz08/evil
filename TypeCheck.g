@@ -57,7 +57,7 @@ nested_decl[HashMap<String,StructType> structtable, StructType inf] returns [Str
           }
           $inf.types.put($rdecl.rid,$rdecl.rtype);
         }
-      )+
+      )+{$fs = $inf;}
    ;
    
 declaration[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
@@ -79,11 +79,13 @@ id_list[HashMap<String,StructType> structtable, HashMap<String,Type> vartable, T
 type[HashMap<String,StructType> structtable] returns [Type rtype = null]
    :  INT {System.out.println("int"); $rtype = new IntType();}
    |  BOOL {System.out.println("bool"); $rtype = new BoolType();}
-   |  ^(STRUCT {System.out.println("struct2"); $rtype = new IntType();} testid = id
+   |  ^(STRUCT {System.out.println("struct2");} testid = id
          {
            if(!$structtable.containsKey($testid.rstring)){
               EvilUtil.die("line " + $testid.linenumber + ": struct " + $testid.rstring  + " does not exist");
            }
+           $rtype = $structtable.get($testid.rstring);
+           System.out.println($structtable);
          })
    ;
 
@@ -92,7 +94,21 @@ id returns [String rstring = null, int linenumber = 0]
    ;
 
 function[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable] returns [String name  = null]
-   :  ^(FUN {System.out.println("fun");} rid=id rparams=params[structtable] ^(RETTYPE {System.out.println("rettype");} return_type[structtable]) declarations[structtable,vartable] statement_list)
+   :  ^(FUN {System.out.println("fun");} rid=id{$name = $rid.rstring;} rparams=params[structtable]
+       ^(RETTYPE {System.out.println("rettype");} rret=return_type[structtable])
+       {
+         if($functable.containsKey($rid.rstring))
+         {
+           EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring + " is already defined.");
+         }
+         FuncType func = new FuncType();
+         func.params.putAll($rparams.rtype);
+         func.returntype = $rret.rtype;
+         $functable.put($rid.rstring, func);
+         HashMap<String,Type> copy_vartable = new HashMap<String,Type>();
+         copy_vartable.putAll(vartable);
+       }
+       declarations[structtable,copy_vartable]{System.out.println("daskdjalkjdhashdlakdakhd " + copy_vartable);} statement_list)
    ;
    
 params[HashMap<String,StructType> structtable] returns [LinkedHashMap<String, Type> rtype = null]
@@ -108,8 +124,8 @@ params[HashMap<String,StructType> structtable] returns [LinkedHashMap<String, Ty
    ;
 
 return_type[HashMap<String,StructType> structtable] returns [Type rtype = null]
-   :  type[structtable]
-   |  VOID {System.out.println("void rtype");}
+   :  expected=type[structtable] {$rtype = $expected.rtype;}
+   |  VOID {System.out.println("void rtype"); $rtype = new Type();}
    ;
 
 statement_list returns [Type rtype = null]
