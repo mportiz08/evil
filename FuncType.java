@@ -1,10 +1,11 @@
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class FuncType extends Type
 {
-  public ArrayList<Type> params;
+  public LinkedHashMap<String, Type> params;
+  public Type returntype; 
   public FuncType()
   {
-    params = new ArrayList<Type>();
+    params = new LinkedHashMap<String, Type>();
   }
 }

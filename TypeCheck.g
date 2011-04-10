@@ -12,10 +12,11 @@ options
    import java.util.HashMap;
    import java.util.Vector;
    import java.util.Iterator;
+   import java.util.LinkedHashMap;
 }
 
-verify[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
-   :  ^(PROGRAM types[structtable] declarations[structtable, vartable] functions[structtable, vartable])
+verify[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
+   :  ^(PROGRAM types[structtable] declarations[structtable, vartable] functions[functable, structtable, vartable])
    ;
 
 types[HashMap<String,StructType> structtable]
@@ -26,8 +27,8 @@ declarations[HashMap<String,StructType> structtable, HashMap<String,Type> vartab
    :  ^(DECLS {System.out.println("decls");} (declaration[structtable,vartable])*)
    ;
 
-functions[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
-   :  ^(FUNCS {System.out.println("funcs");} (function[structtable, vartable])*)
+functions[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
+   :  ^(FUNCS {System.out.println("funcs");} (function[functable, structtable, vartable])*)
    ;
 
 type_sub[HashMap<String,StructType> structtable]
@@ -60,7 +61,8 @@ nested_decl[HashMap<String,StructType> structtable, StructType inf] returns [Str
    ;
    
 declaration[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
-   :  ^(DECLLIST {System.out.println("decllist");} ^(TYPE {System.out.println("type");} dtype=type[structtable]) id_list[structtable,vartable,dtype])
+   :  ^(DECLLIST {System.out.println("decllist");} ^(TYPE {System.out.println("type");} 
+        dtype=type[structtable]{$dtype.rtype.global = true;}) id_list[structtable,vartable,dtype])
    ;
    
 id_list[HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type dtype]
@@ -89,12 +91,20 @@ id returns [String rstring = null, int linenumber = 0]
    : ^(tnode=ID {System.out.println("id"); $rstring = $tnode.text; $linenumber = $tnode.line;})
    ;
 
-function[HashMap<String,StructType> structtable, HashMap<String,Type> vartable] returns [String name  = null]
-   :  ^(FUN {System.out.println("fun");} id params[structtable] ^(RETTYPE {System.out.println("rettype");} return_type[structtable]) declarations[structtable,vartable] statement_list)
+function[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable] returns [String name  = null]
+   :  ^(FUN {System.out.println("fun");} rid=id rparams=params[structtable] ^(RETTYPE {System.out.println("rettype");} return_type[structtable]) declarations[structtable,vartable] statement_list)
    ;
    
-params[HashMap<String,StructType> structtable] returns [Type rtype = null]
-   :  ^(PARAMS {System.out.println("params");} (decl[structtable])*)
+params[HashMap<String,StructType> structtable] returns [LinkedHashMap<String, Type> rtype = null]
+   :  ^(PARAMS {System.out.println("params"); $rtype = new LinkedHashMap<String, Type>();} (rdecl=decl[structtable]
+        {
+          if(!$rtype.containsKey($rdecl.rid))
+          {
+            EvilUtil.die("line " + $rdecl.linenumber + ": " + $rdecl.rid + " is already defined.");
+          }
+          $rtype.put($rdecl.rid, $rdecl.rtype);
+        }
+      )*)
    ;
 
 return_type[HashMap<String,StructType> structtable] returns [Type rtype = null]

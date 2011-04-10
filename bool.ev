@@ -2,15 +2,16 @@ struct Tree
 {
    int i;
    bool b;
-   struct Rree t;
+   struct Tree t;
 };
 
 int a, b, c;
 bool d, e, f;
 
-fun foo(int i) int      # standard case
+fun foo(bool a, int a) bool      # standard case
 {
-   return i;
+   int b;
+   return a;
 }
 
 fun bar(int i) int      # control flow case

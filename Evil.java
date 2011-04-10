@@ -43,7 +43,7 @@ public class Evil
          nodes.setTokenStream(tokens);
          TypeCheck tparser = new TypeCheck(nodes);
 
-         tparser.verify(new HashMap<String, StructType>(), new HashMap<String, Type>());
+         tparser.verify(new HashMap<String, FuncType>(), new HashMap<String, StructType>(), new HashMap<String, Type>());
       }
       catch (org.antlr.runtime.RecognitionException e)
       {
