@@ -536,7 +536,14 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
    |  INTEGER {/*System.out.println("random expression");*/ $rtype = new IntType(); }
    |  TRUE {/*System.out.println("random expression");*/ $rtype = new BoolType();}
    |  FALSE {/*System.out.println("random expression");*/ $rtype = new BoolType(); }
-   |  ^(NEW {/*System.out.println("random expression");*/} rid=id {$rtype = new StructType();})
+   |  ^(NEW {/*System.out.println("random expression");*/} rid=id 
+        {
+          if(!$structtable.containsKey($rid.rstring))
+          {
+            EvilUtil.die("line " + $fid.linenumber + ": " + $fid.rstring + " has not been defined.");
+          }
+          $rtype = $structtable.get($rid.rstring);
+        })
    |  NULL {/*System.out.println("random expression");*/ $rtype = new StructType();}
    |  ^(tnode=INVOKE {/*System.out.println("invoke: " + $tnode.text);*/} fid=id args=arguments[functable,structtable,vartable,rret]
          {
@@ -555,6 +562,16 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
              if(!(t.getClass().getName().equals($args.arglist.get(i).getClass().getName())))
              {
                EvilUtil.die("line " + $fid.linenumber + ": mismatched types in function call to " + $fid.rstring);
+             }
+             if(t.isStruct())
+             {
+               if(((StructType)($args.arglist.get(i))).name != null)
+               {
+                 if(!((StructType)($args.arglist.get(i))).name.equals(((StructType)(t)).name))
+                 {
+                   EvilUtil.die("line " + $fid.linenumber + ": mismatched types in function call to " + $fid.rstring);
+                 }
+               }
              }
              i++;
            }
