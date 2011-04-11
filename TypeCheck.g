@@ -181,7 +181,21 @@ block[HashMap<String, FuncType> functable, HashMap<String,StructType> structtabl
    ;
    
 assignment[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   :  ^(ASSIGN {System.out.println("assign");} expression[functable,structtable,vartable,rret] lvalue[functable,structtable,vartable,rret])
+   :  ^(tnode=ASSIGN {System.out.println("assign");} rv=expression[functable,structtable,vartable,rret] lv=lvalue[functable,structtable,vartable,rret]
+         {
+           if($lv.rtype.isStruct())
+           {
+             System.out.println("STRUCT LV");
+           }
+           else
+           {
+             if(!$lv.rtype.getClass().getName().equals($rv.rtype.getClass().getName()))
+             {
+               EvilUtil.die("line " + $tnode.line + ": " + " types must match for an assignment.");
+             }
+           }
+         }
+       )
    ;
    
 print[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
@@ -256,8 +270,15 @@ invocation[HashMap<String, FuncType> functable, HashMap<String,StructType> struc
        )
    ;
    
-lvalue [HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   :  id
+lvalue [HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret] returns [Type rtype = null]
+   :  rid=id
+        {
+          if(!$vartable.containsKey($rid.rstring))
+          {
+            EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring + " has not been defined.");
+          }
+          $rtype = $vartable.get($rid.rstring);
+        }
    | ^(DOT {System.out.println("lvalue dot");} lvalue[functable,structtable,vartable,rret] id)
    ;
    

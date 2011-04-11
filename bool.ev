@@ -39,12 +39,11 @@ fun foo(bool c, struct Tree hello) struct Tree      # standard case
    struct A a;
 
    print a.b.c.d;
+   
 
    b = 3;
    print b;
-   hello.i = b;
    delete hello;
-   b = hello.t;
    if(b != 3){
      return hello;
    }
