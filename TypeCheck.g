@@ -39,7 +39,11 @@ type_sub[HashMap<String,StructType> structtable]
             }
           $structtable.put($rid.rstring, new StructType());
         }
-        filledStruct = nested_decl[structtable,new StructType()]{$structtable.put($rid.rstring,$filledStruct.fs);}
+        filledStruct = nested_decl[structtable,new StructType()]
+          {
+            $filledStruct.fs.name = $rid.rstring;
+            $structtable.put($rid.rstring,$filledStruct.fs);
+          }
         )
    ;
 
@@ -185,7 +189,17 @@ assignment[HashMap<String, FuncType> functable, HashMap<String,StructType> struc
          {
            if($lv.rtype.isStruct())
            {
-             System.out.println("STRUCT LV");
+             if($rv.rtype.isStruct())
+             {
+               if(!((StructType)$lv.rtype).name.equals(((StructType)$rv.rtype).name))
+               {
+                 EvilUtil.die("line " + $tnode.line + ": " + " types must match for an assignment.");
+               }
+             }
+             else
+             {
+               EvilUtil.die("line " + $tnode.line + ": " + " types must match for an assignment.");
+             }
            }
            else
            {
@@ -279,7 +293,25 @@ lvalue [HashMap<String, FuncType> functable, HashMap<String,StructType> structta
           }
           $rtype = $vartable.get($rid.rstring);
         }
-   | ^(DOT {System.out.println("lvalue dot");} lvalue[functable,structtable,vartable,rret] id)
+   | ^(tnode=DOT {System.out.println("lvalue dot");} lv=lvalue[functable,structtable,vartable,rret]
+        {
+          if(!$lv.rtype.isStruct())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + " left hand side must be of type struct.");
+          }
+        }
+      rid=id
+        {
+          if(((StructType)$lv.rtype).types.containsKey($rid.rstring))
+          {
+            $rtype = ((StructType)$lv.rtype).types.get($rid.rstring);
+          }
+          else
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + " invalid struct field");
+          }
+        }
+      )
    ;
    
 expression [HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret] returns [Type rtype = null]

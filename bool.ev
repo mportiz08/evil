@@ -37,9 +37,10 @@ fun foo(bool c, struct Tree hello) struct Tree      # standard case
 {
    int b;
    struct A a;
+   struct C cs;
 
    print a.b.c.d;
-   
+   a.b.c = cs;   
 
    b = 3;
    print b;
