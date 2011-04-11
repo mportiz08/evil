@@ -37,12 +37,13 @@ type_sub[HashMap<String,StructType> structtable]
           if($structtable.containsKey($rid.rstring)){
                EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring  + " is already declared");
             }
-          $structtable.put($rid.rstring, new StructType());
+          StructType temp = new StructType();
+          $structtable.put($rid.rstring, temp);
         }
-        filledStruct = nested_decl[structtable,new StructType()]
+        filledStruct = nested_decl[structtable,temp]
           {
             $filledStruct.fs.name = $rid.rstring;
-            $structtable.put($rid.rstring,$filledStruct.fs);
+            /*$structtable.put($rid.rstring,$filledStruct.fs);*/
           }
         )
    ;
