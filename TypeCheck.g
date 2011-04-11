@@ -39,12 +39,8 @@ type_sub[HashMap<String,StructType> structtable]
             }
           $structtable.put($rid.rstring, new StructType());
         }
-        filledStruct = nested_decl[structtable,new StructType()]
-        {
-          $filledStruct.fs.name = $rid.rstring; 
-          $structtable.put($rid.rstring,$filledStruct.fs);
-        }
-      )
+        filledStruct = nested_decl[structtable,new StructType()]{$structtable.put($rid.rstring,$filledStruct.fs);}
+        )
    ;
 
 decl [HashMap<String,StructType> structtable] returns [Type rtype = null, String rid = null, int linenumber = 0]
@@ -185,11 +181,11 @@ block[HashMap<String, FuncType> functable, HashMap<String,StructType> structtabl
    ;
    
 assignment[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   :  ^(ASSIGN {System.out.println("assign");} expression[functable,structtable,vartable,rret,null] lvalue[functable,structtable,vartable,rret])
+   :  ^(ASSIGN {System.out.println("assign");} expression[functable,structtable,vartable,rret] lvalue[functable,structtable,vartable,rret])
    ;
    
 print[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   :  ^(tnode=PRINT {System.out.println("print");} uv=expression[functable,structtable,vartable,rret,null] (ENDL {System.out.println("endl");})?
+   :  ^(tnode=PRINT {System.out.println("print");} uv=expression[functable,structtable,vartable,rret] (ENDL {System.out.println("endl");})?
          {
            if(!$uv.rtype.isInt())
            {
@@ -204,7 +200,7 @@ read[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable
    ;
    
 conditional[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   :  ^(tnode=IF {System.out.println("if");} exp=expression[functable,structtable,vartable,rret,null]
+   :  ^(tnode=IF {System.out.println("if");} exp=expression[functable,structtable,vartable,rret]
          {
            if(!$exp.rtype.isBool())
            {
@@ -216,7 +212,7 @@ conditional[HashMap<String, FuncType> functable, HashMap<String,StructType> stru
    ;
    
 loop[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   :  ^(tnode=WHILE {System.out.println("while");} exp=expression[functable,structtable,vartable,rret,null]
+   :  ^(tnode=WHILE {System.out.println("while");} exp=expression[functable,structtable,vartable,rret]
          {
            if(!$exp.rtype.isBool())
            {
@@ -224,29 +220,15 @@ loop[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable
            }
          }
        block[functable,structtable,vartable,rret] 
-       expression[functable,structtable,vartable,rret,null])
+       expression[functable,structtable,vartable,rret])
    ;
  
 delete[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   :  ^(tnode=DELETE {System.out.println("delete");} exp=expression[functable,structtable,vartable,rret,null]
-         {
-           if(!$exp.rtype.isStruct())
-           {
-             EvilUtil.die("line " + $tnode.line + ": expression in delete must be of type struct");
-           }
-         }
-       )
+   :  ^(DELETE {System.out.println("delete");} expression[functable,structtable,vartable,rret])
    ;
    
 ret[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   : ^(tnode=RETURN {System.out.println("ret");} (exp=expression[functable,structtable,vartable,rret,null]
-        {
-          if(!($exp.rtype.getClass().getName().equals($rret.getClass().getName())))
-          {
-             EvilUtil.die("line " + $tnode.line + ": bad return type.");
-          }
-        }
-      )?)
+   : ^(RETURN {System.out.println("ret");} (expression[functable,structtable,vartable,rret])?)
    ;
    
 invocation[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
@@ -279,9 +261,9 @@ lvalue [HashMap<String, FuncType> functable, HashMap<String,StructType> structta
    | ^(DOT {System.out.println("lvalue dot");} lvalue[functable,structtable,vartable,rret] id)
    ;
    
-expression [HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret, String flag] returns [Type rtype = null, String rstring]
-   : ^(tnode=AND {System.out.println("random expression");} lv = expression[functable,structtable,vartable,rret,null] 
-                                                            rv = expression[functable,structtable,vartable,rret,null]
+expression [HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret] returns [Type rtype = null]
+   : ^(tnode=AND {System.out.println("random expression");} lv = expression[functable,structtable,vartable,rret] 
+                                                            rv = expression[functable,structtable,vartable,rret]
         {
           if(!$lv.rtype.isBool())
           {
@@ -293,8 +275,8 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           }
           $rtype = new BoolType();
         })
-   | ^(tnode=OR {System.out.println("random expression");} lv = expression[functable,structtable,vartable,rret,null] 
-                                                           rv = expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=OR {System.out.println("random expression");} lv = expression[functable,structtable,vartable,rret] 
+                                                           rv = expression[functable,structtable,vartable,rret]
         {
           if(!$lv.rtype.isBool())
           {
@@ -307,8 +289,8 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           $rtype = new BoolType();
         }
       )
-   | ^(tnode=EQ {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret,null]
-                                                           rv = expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=EQ {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
+                                                           rv = expression[functable,structtable,vartable,rret]
         {
           if(!$lv.rtype.isInt() && !$lv.rtype.isStruct())
           {
@@ -321,8 +303,8 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           $rtype = new BoolType();
         }
       )
-   | ^(tnode=LT {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret,null]
-                                                           rv = expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=LT {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
+                                                           rv = expression[functable,structtable,vartable,rret]
         {
           if(!$lv.rtype.isInt())
           {
@@ -335,8 +317,8 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           $rtype = new BoolType();
         }
       )
-   | ^(tnode=GT {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret,null]
-                                                           rv = expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=GT {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
+                                                           rv = expression[functable,structtable,vartable,rret]
         {
           if(!$lv.rtype.isInt())
           {
@@ -349,8 +331,8 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           $rtype = new BoolType();
         }
       )
-   | ^(tnode=NE {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret,null]
-                                                           rv = expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=NE {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
+                                                           rv = expression[functable,structtable,vartable,rret]
         {
           if(!$lv.rtype.isInt() && !$lv.rtype.isStruct())
           {
@@ -363,8 +345,8 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           $rtype = new BoolType();
         }
       )
-   | ^(tnode=LE {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret,null]
-                                                           rv = expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=LE {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
+                                                           rv = expression[functable,structtable,vartable,rret]
         {
           if(!$lv.rtype.isInt())
           {
@@ -377,8 +359,8 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           $rtype = new BoolType();
         }
       )
-   | ^(tnode=GE {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret,null]
-                                                           rv = expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=GE {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
+                                                           rv = expression[functable,structtable,vartable,rret]
         {
           if(!$lv.rtype.isInt())
           {
@@ -391,8 +373,8 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           $rtype = new BoolType();
         }
       )
-   | ^(tnode=PLUS {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret,null]
-                                                             rv = expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=PLUS {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
+                                                             rv = expression[functable,structtable,vartable,rret]
         {
           if(!$lv.rtype.isInt())
           {
@@ -405,8 +387,8 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           $rtype = new IntType();
         }
       )
-   | ^(tnode=MINUS {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret,null]
-                                                              rv = expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=MINUS {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
+                                                              rv = expression[functable,structtable,vartable,rret]
         {
           if(!$lv.rtype.isInt())
           {
@@ -419,8 +401,8 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           $rtype = new IntType();
         }
       )
-   | ^(tnode=TIMES {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret,null]
-                                                              rv = expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=TIMES {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
+                                                              rv = expression[functable,structtable,vartable,rret]
         {
           if(!$lv.rtype.isInt())
           {
@@ -433,8 +415,8 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           $rtype = new IntType();
         }
       )
-   | ^(tnode=DIVIDE {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret,null]
-                                                               rv = expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=DIVIDE {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
+                                                               rv = expression[functable,structtable,vartable,rret]
         {
           if(!$lv.rtype.isInt())
           {
@@ -447,7 +429,7 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           $rtype = new IntType();
         }
       )
-   | ^(tnode=NOT {System.out.println("random expression");} uv=expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=NOT {System.out.println("random expression");} uv=expression[functable,structtable,vartable,rret]
         {
           if(!$uv.rtype.isBool())
           {
@@ -456,7 +438,7 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           $rtype = new BoolType();
         }
       )
-   | ^(tnode=NEG {System.out.println("random expression");} uv=expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=NEG {System.out.println("random expression");} uv=expression[functable,structtable,vartable,rret]
         {
           if(!$uv.rtype.isInt())
           {
@@ -465,32 +447,35 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           $rtype = new IntType();
         }
       )
-   | ^(tnode=DOT {System.out.println("dot");} 
-        lv = expression[functable,structtable,vartable,rret,null]
+   | ^(tnode=DOT {System.out.println("random expression DOT");} llv=expression[functable,structtable,vartable,rret]
         {
-           if(!$vartable.get($lv.rstring).isStruct()){
-             EvilUtil.die("line " + $tnode.line + ": " + $lv.rstring + " is not of type struct");
-           }
-           String temp = $lv.rstring;
-        } 
-        rv = expression[functable,structtable,vartable,rret,temp]
-        {
-          if(structtable.get($lv.rstring).types.containsKey($rv.rstring)){
-            EvilUtil.die("line " + $tnode.line + ": " + $rv.rstring + " is not a member of left hand side");
+          if(!$llv.rtype.isStruct())
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + " left hand side must be of type struct.");
           }
-    	    $rtype = $structtable.get($rv.rstring);
-        })
+          //System.out.println("STRUCT: " + ((StructType)$llv.rtype).types);
+        }
+      rrv=id
+        {
+          //System.out.println("DEBUG: " + $llv.rtype);
+          if(((StructType)$llv.rtype).types.containsKey($rrv.rstring))
+          {
+            //System.out.println("   ~> valid field: " + $rrv.rstring);
+            $rtype = ((StructType)$llv.rtype).types.get($rrv.rstring);
+          }
+          else
+          {
+            EvilUtil.die("line " + $tnode.line + ": " + " invalid struct field");
+          }
+        }
+      )
    |  rid = id 
         {
-          if($flag == null)
-          {
-            System.out.println("random expression");
-            if(!$vartable.containsKey($rid.rstring)){
-              EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring + " does not exist");
-            }
-            $rtype = $vartable.get($rid.rstring);
+          System.out.println("random expression");
+          if(!$vartable.containsKey($rid.rstring)){
+            EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring + " does not exist");
           }
-          $rstring = $rid.rstring;
+          $rtype = $vartable.get($rid.rstring);
         }
    |  INTEGER {System.out.println("random expression"); $rtype = new IntType(); }
    |  TRUE {System.out.println("random expression"); $rtype = new BoolType();}
@@ -505,7 +490,7 @@ arguments[HashMap<String, FuncType> functable, HashMap<String,StructType> struct
    
 arg_list[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret] returns [ArrayList<Type> arglist = null]
    :  ARGS
-   |  ^(ARGS {System.out.println("args"); $arglist = new ArrayList<Type>();} (arg=expression[functable,structtable,vartable,rret,null]
+   |  ^(ARGS {System.out.println("args"); $arglist = new ArrayList<Type>();} (arg=expression[functable,structtable,vartable,rret]
         {
           $arglist.add($arg.rtype);
         }

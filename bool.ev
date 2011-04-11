@@ -5,6 +5,21 @@ struct Tree
    struct Tree t;
 };
 
+struct C
+{
+  int d;
+};
+
+struct B
+{
+  struct C c;
+};
+
+struct A
+{
+  struct B b;
+};
+
 struct Tree2
 {
    int i; 
@@ -21,6 +36,10 @@ bool d, e, f;
 fun foo(bool c, struct Tree hello) struct Tree      # standard case
 {
    int b;
+   struct A a;
+
+   print a.b.c.d;
+
    b = 3;
    print b;
    hello.i = b;
