@@ -18,17 +18,17 @@ struct Tree2 def;
 int a, b, c;
 bool d, e, f;
 
-fun foo(bool c, struct Tree a) struct Tree      # standard case
+fun foo(bool c, struct Tree hello) struct Tree      # standard case
 {
    int b;
    b = 3;
    print b;
-   a.i = b;
+   hello.i = b;
    b = b + 3;
    if(b != 3){
-     return a;
+     return hello;
    }
-   return a;
+   return hello;
 }
 
 fun bar(int i) int      # control flow case

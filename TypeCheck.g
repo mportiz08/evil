@@ -101,10 +101,10 @@ function[HashMap<String, FuncType> functable, HashMap<String,StructType> structt
            EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring + " is already defined.");
          }
          FuncType func = new FuncType();
-         func.params.putAll($rparams.rtype);
          $functable.put($rid.rstring, func);
          HashMap<String,Type> copy_vartable = new HashMap<String,Type>();
          copy_vartable.putAll(vartable);
+         copy_vartable.putAll($rparams.rtype);
        }
        localdeclarations[structtable,copy_vartable] statement_list[functable,structtable,copy_vartable,rret])
    ;
@@ -129,7 +129,9 @@ localid_list[HashMap<String,StructType> structtable, HashMap<String,Type> vartab
          {
            EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring + " is already defined.");
          }
+         System.out.println("putting local: " + $rid.rstring);
          $vartable.put($rid.rstring,$dtype);
+	   System.out.println(vartable);
        }
      )+
    ;
@@ -256,11 +258,11 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
    | ^(tnode=EQ {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
                                                            rv = expression[functable,structtable,vartable,rret]
         {
-          if(!$lv.rtype.isInt() || !$lv.rtype.isStruct())
+          if(!$lv.rtype.isInt() && !$lv.rtype.isStruct())
           {
             EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type [int, struct].");
           }
-          if(!$rv.rtype.isInt() || !$rv.rtype.isStruct())
+          if(!$rv.rtype.isInt() && !$rv.rtype.isStruct())
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type [int, struct].");
           }
@@ -298,11 +300,12 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
    | ^(tnode=NE {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
                                                            rv = expression[functable,structtable,vartable,rret]
         {
-          if(!$lv.rtype.isInt() || !$lv.rtype.isStruct())
+          System.out.println("lv : " + $lv.rtype);
+          if(!$lv.rtype.isInt() && !$lv.rtype.isStruct())
           {
             EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type [int, struct].");
           }
-          if(!$rv.rtype.isInt() || !$rv.rtype.isStruct())
+          if(!$rv.rtype.isInt() && !$rv.rtype.isStruct())
           {
             EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type [int, struct].");
           }
@@ -422,7 +425,14 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           }
         }
       )
-   |  rid = id {System.out.println("random expression");}
+   |  rid = id 
+        {
+          System.out.println("random expression");
+          if(!$vartable.containsKey($rid.rstring)){
+            EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring + " does not exist");
+          }
+          $rtype = $vartable.get($rid.rstring);
+        }
    |  INTEGER {System.out.println("random expression"); $rtype = new IntType(); }
    |  TRUE {System.out.println("random expression"); $rtype = new BoolType();}
    |  FALSE {System.out.println("random expression"); $rtype = new BoolType(); }
