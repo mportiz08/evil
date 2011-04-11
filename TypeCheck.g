@@ -129,9 +129,7 @@ localid_list[HashMap<String,StructType> structtable, HashMap<String,Type> vartab
          {
            EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring + " is already defined.");
          }
-         System.out.println("putting local: " + $rid.rstring);
          $vartable.put($rid.rstring,$dtype);
-	   System.out.println(vartable);
        }
      )+
    ;
@@ -300,7 +298,6 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
    | ^(tnode=NE {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
                                                            rv = expression[functable,structtable,vartable,rret]
         {
-          System.out.println("lv : " + $lv.rtype);
           if(!$lv.rtype.isInt() && !$lv.rtype.isStruct())
           {
             EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type [int, struct].");
