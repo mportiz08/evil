@@ -101,6 +101,7 @@ function[HashMap<String, FuncType> functable, HashMap<String,StructType> structt
            EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring + " is already defined.");
          }
          FuncType func = new FuncType();
+         func.params.putAll($rparams.rtype);
          $functable.put($rid.rstring, func);
          HashMap<String,Type> copy_vartable = new HashMap<String,Type>();
          copy_vartable.putAll(vartable);
@@ -217,7 +218,24 @@ ret[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable,
    ;
    
 invocation[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   :  ^(INVOKE {System.out.println("invoke");} id arguments[functable,structtable,vartable,rret])
+   :  ^(tnode=INVOKE {System.out.println("invoke: " + $tnode.text);} fid=id args=arguments[functable,structtable,vartable,rret]
+         {
+           if(!$functable.containsKey($fid.rstring))
+           {
+             EvilUtil.die("line " + $fid.linenumber + ": " + $fid.rstring + " has not been defined.");
+           }
+           FuncType temp = $functable.get($fid.rstring);
+           int i = 0;
+           for(Type t : temp.params.values())
+           {
+             if(!(t.getClass().getName().equals($args.arglist.get(i).getClass().getName())))
+             {
+               EvilUtil.die("line " + $fid.linenumber + ": mismatched types in function call " + $fid.rstring);
+             }
+             i++;
+           }
+         }
+       )
    ;
    
 lvalue [HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
@@ -413,15 +431,6 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
       )
    | ^(DOT {System.out.println("random expression");} expression[functable,structtable,vartable,rret] 
                                                       expression[functable,structtable,vartable,rret])
-   | ^(tnode=INVOKE {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
-                                                               args=arguments[functable,structtable,vartable,rret]
-        {
-          if(!$lv.rtype.isFunc())
-          {
-            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not a function.");
-          }
-        }
-      )
    |  rid = id 
         {
           System.out.println("random expression");
@@ -437,11 +446,15 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
    |  NULL {System.out.println("random expression"); $rtype = new Type();}
    ;
    
-arguments[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   :  arg_list[functable,structtable,vartable,rret]
+arguments[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret] returns [ArrayList<Type> arglist = null]
+   :  robbery=arg_list[functable,structtable,vartable,rret] {$arglist = $robbery.arglist;}
    ;
    
-arg_list[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
+arg_list[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret] returns [ArrayList<Type> arglist = null]
    :  ARGS
-   |  ^(ARGS {System.out.println("args");} (expression[functable,structtable,vartable,rret])+)
+   |  ^(ARGS {System.out.println("args"); $arglist = new ArrayList<Type>();} (arg=expression[functable,structtable,vartable,rret]
+        {
+          $arglist.add($arg.rtype);
+        }
+      )+)
    ;

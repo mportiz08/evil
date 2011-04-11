@@ -31,8 +31,14 @@ fun foo(bool c, struct Tree hello) struct Tree      # standard case
    return hello;
 }
 
+fun foobar(bool a) void
+{
+  return;
+}
+
 fun bar(int i) int      # control flow case
 {
+   foobar(1);
    if (false && true)
    {
       return 1;
