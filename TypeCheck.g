@@ -107,9 +107,34 @@ function[HashMap<String, FuncType> functable, HashMap<String,StructType> structt
          HashMap<String,Type> copy_vartable = new HashMap<String,Type>();
          copy_vartable.putAll(vartable);
        }
-       declarations[structtable,copy_vartable] statement_list)
+       localdeclarations[structtable,copy_vartable] statement_list)
+   ;
+
+localdeclarations[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
+   :  ^(DECLS {System.out.println("decls");} (localdeclaration[structtable,vartable])*)
+   ;
+
+localdeclaration[HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
+   :  ^(DECLLIST {System.out.println("decllist");} ^(TYPE {System.out.println("type");} 
+        dtype=type[structtable]) localid_list[structtable,vartable,dtype])
    ;
    
+localid_list[HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type dtype]
+   : (rid=id
+       {
+         if($vartable.containsKey($rid.rstring) && !$vartable.get($rid.rstring).global)
+         {
+           EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring + " is already defined.");
+         }
+         if($structtable.containsKey($rid.rstring) && !$structtable.get($rid.rstring).global)
+         {
+           EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring + " is already defined.");
+         }
+         $vartable.put($rid.rstring,$dtype);
+       }
+     )+
+   ;
+
 params[HashMap<String,StructType> structtable, HashMap<String,Type> vartable] returns [LinkedHashMap<String, Type> rtype = null]
    :  ^(PARAMS {System.out.println("params"); $rtype = new LinkedHashMap<String, Type>();} (rdecl=decl[structtable]
         {
