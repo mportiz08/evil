@@ -28,7 +28,18 @@ declarations[HashMap<String,StructType> structtable, HashMap<String,Type> vartab
    ;
 
 functions[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable]
-   :  ^(FUNCS {/*System.out.println("funcs");*/} (function[functable, structtable, vartable])*)
+   :  ^(FUNCS {/*System.out.println("funcs");*/boolean mainfound = false;} (fun=function[functable, structtable, vartable]
+       {
+         if($fun.name.equals("main")){
+           mainfound = true;
+         }
+       }
+       )*)
+       {
+         if(!mainfound){
+           EvilUtil.die("no main method found");
+         }
+       }
    ;
 
 type_sub[HashMap<String,StructType> structtable]
@@ -112,6 +123,7 @@ function[HashMap<String, FuncType> functable, HashMap<String,StructType> structt
          HashMap<String,Type> copy_vartable = new HashMap<String,Type>();
          copy_vartable.putAll(vartable);
          copy_vartable.putAll($rparams.rtype);
+         $name = $rid.rstring;
        }
        localdeclarations[structtable,copy_vartable] statement_list[functable,structtable,copy_vartable,rret])
    ;
@@ -163,7 +175,7 @@ params[HashMap<String,StructType> structtable, HashMap<String,Type> vartable] re
 
 return_type[HashMap<String,StructType> structtable] returns [Type rtype = null]
    :  expected=type[structtable] {$rtype = $expected.rtype;}
-   |  VOID {/*System.out.println("void rtype");*/ $rtype = new Type();}
+   |  VOID {/*System.out.println("void rtype");*/ $rtype = new StructType();}
    ;
 
 statement_list[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
@@ -258,7 +270,44 @@ delete[HashMap<String, FuncType> functable, HashMap<String,StructType> structtab
    ;
    
 ret[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   : ^(RETURN {/*System.out.println("ret");*/} (expression[functable,structtable,vartable,rret])?)
+
+@init { boolean retexp = false; }
+   : ^(tnode=RETURN {/*System.out.println("ret");*/} (exp=expression[functable,structtable,vartable,rret]
+        {
+          retexp = true;
+          if($rret.isStruct())
+           {
+             if($exp.rtype.isStruct())
+             {
+               if(!((StructType)$rret).name.equals(((StructType)$exp.rtype).name))
+               {
+                 EvilUtil.die("line " + $tnode.line + ": invalid return type.");
+               }
+             }
+             else
+             {
+               EvilUtil.die("line " + $tnode.line + ": invalid return type.");
+             }
+           }
+           else
+           {
+             if(!$rret.getClass().getName().equals($exp.rtype.getClass().getName()))
+             {
+               EvilUtil.die("line " + $tnode.line + ": invalid return type.");
+             }
+           }
+           //System.out.println(exp);
+        }
+      )?)
+        {
+          //System.out.println("exp: " + $exp.rtype + " rret: " + $rret);
+          if(!retexp)
+          {
+            if($rret.isInt() || $rret.isBool() ||($rret.isStruct() && ((StructType)$rret).name != null)){
+              EvilUtil.die("line " + $tnode.line + ": void return in non-void function.");
+            }
+          }
+        }
    ;
    
 lvalue [HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret] returns [Type rtype = null]
