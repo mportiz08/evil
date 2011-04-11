@@ -200,13 +200,27 @@ read[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable
    ;
    
 conditional[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   :  ^(IF {System.out.println("if");} expression[functable,structtable,vartable,rret] block[functable,structtable,vartable,rret] 
+   :  ^(tnode=IF {System.out.println("if");} exp=expression[functable,structtable,vartable,rret]
+         {
+           if(!$exp.rtype.isBool())
+           {
+             EvilUtil.die("line " + $tnode.line + ": expression in conditional must be of type bool");
+           }
+         }
+       block[functable,structtable,vartable,rret] 
         (block[functable,structtable,vartable,rret])?)
    ;
    
 loop[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   :  ^(WHILE {System.out.println("while");} expression[functable,structtable,vartable,rret] block[functable,structtable,vartable,rret] 
-         expression[functable,structtable,vartable,rret])
+   :  ^(tnode=WHILE {System.out.println("while");} exp=expression[functable,structtable,vartable,rret]
+         {
+           if(!$exp.rtype.isBool())
+           {
+             EvilUtil.die("line " + $tnode.line + ": expression in loop must be of type bool");
+           }
+         }
+       block[functable,structtable,vartable,rret] 
+       expression[functable,structtable,vartable,rret])
    ;
  
 delete[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
@@ -225,12 +239,16 @@ invocation[HashMap<String, FuncType> functable, HashMap<String,StructType> struc
              EvilUtil.die("line " + $fid.linenumber + ": " + $fid.rstring + " has not been defined.");
            }
            FuncType temp = $functable.get($fid.rstring);
+           if(temp.params.values().size() != $args.arglist.size())
+           {
+              EvilUtil.die("line " + $fid.linenumber + ": wrong number of arguments in call to " + $fid.rstring);
+           }
            int i = 0;
            for(Type t : temp.params.values())
            {
              if(!(t.getClass().getName().equals($args.arglist.get(i).getClass().getName())))
              {
-               EvilUtil.die("line " + $fid.linenumber + ": mismatched types in function call " + $fid.rstring);
+               EvilUtil.die("line " + $fid.linenumber + ": mismatched types in function call to " + $fid.rstring);
              }
              i++;
            }
