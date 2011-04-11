@@ -45,7 +45,7 @@ fun foo(bool c, struct Tree hello) struct Tree      # standard case
    b = 3;
    print b;
    delete hello;
-   if(b != 3){
+   if(3 != 5){
      return hello;
    }
    while(true) {

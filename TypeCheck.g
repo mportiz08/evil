@@ -345,14 +345,27 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
    | ^(tnode=EQ {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
                                                            rv = expression[functable,structtable,vartable,rret]
         {
-          if(!$lv.rtype.isInt() && !$lv.rtype.isStruct())
-          {
-            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type [int, struct].");
-          }
-          if(!$rv.rtype.isInt() && !$rv.rtype.isStruct())
-          {
-            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type [int, struct].");
-          }
+          if($lv.rtype.isStruct())
+           {
+             if($rv.rtype.isStruct())
+             {
+               if(!((StructType)$lv.rtype).name.equals(((StructType)$rv.rtype).name))
+               {
+                 EvilUtil.die("line " + $tnode.line + ": " + " types must match for an assignment.");
+               }
+             }
+             else
+             {
+               EvilUtil.die("line " + $tnode.line + ": " + " types must match for an assignment.");
+             }
+           }
+           else
+           {
+             if(!$lv.rtype.getClass().getName().equals($rv.rtype.getClass().getName()))
+             {
+               EvilUtil.die("line " + $tnode.line + ": " + " types must match for an assignment.");
+             }
+           }
           $rtype = new BoolType();
         }
       )
@@ -387,14 +400,27 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
    | ^(tnode=NE {System.out.println("random expression");} lv=expression[functable,structtable,vartable,rret]
                                                            rv = expression[functable,structtable,vartable,rret]
         {
-          if(!$lv.rtype.isInt() && !$lv.rtype.isStruct())
-          {
-            EvilUtil.die("line " + $tnode.line + ": " + $lv.text + " is not of type [int, struct].");
-          }
-          if(!$rv.rtype.isInt() && !$rv.rtype.isStruct())
-          {
-            EvilUtil.die("line " + $tnode.line + ": " + $rv.text + " is not of type [int, struct].");
-          }
+          if($lv.rtype.isStruct())
+           {
+             if($rv.rtype.isStruct())
+             {
+               if(!((StructType)$lv.rtype).name.equals(((StructType)$rv.rtype).name))
+               {
+                 EvilUtil.die("line " + $tnode.line + ": " + " types must match for an assignment.");
+               }
+             }
+             else
+             {
+               EvilUtil.die("line " + $tnode.line + ": " + " types must match for an assignment.");
+             }
+           }
+           else
+           {
+             if(!$lv.rtype.getClass().getName().equals($rv.rtype.getClass().getName()))
+             {
+               EvilUtil.die("line " + $tnode.line + ": " + " types must match for an assignment.");
+             }
+           }
           $rtype = new BoolType();
         }
       )
