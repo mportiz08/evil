@@ -85,7 +85,6 @@ type[HashMap<String,StructType> structtable] returns [Type rtype = null]
               EvilUtil.die("line " + $testid.linenumber + ": struct " + $testid.rstring  + " does not exist");
            }
            $rtype = $structtable.get($testid.rstring);
-           System.out.println($structtable);
          })
    ;
 
@@ -94,7 +93,7 @@ id returns [String rstring = null, int linenumber = 0]
    ;
 
 function[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable] returns [String name  = null]
-   :  ^(FUN {System.out.println("fun");} rid=id{$name = $rid.rstring;} rparams=params[structtable]
+   :  ^(FUN {System.out.println("fun");} rid=id{$name = $rid.rstring;} rparams=params[structtable,vartable]
        ^(RETTYPE {System.out.println("rettype");} rret=return_type[structtable])
        {
          if($functable.containsKey($rid.rstring))
@@ -108,13 +107,21 @@ function[HashMap<String, FuncType> functable, HashMap<String,StructType> structt
          HashMap<String,Type> copy_vartable = new HashMap<String,Type>();
          copy_vartable.putAll(vartable);
        }
-       declarations[structtable,copy_vartable]{System.out.println("daskdjalkjdhashdlakdakhd " + copy_vartable);} statement_list)
+       declarations[structtable,copy_vartable] statement_list)
    ;
    
-params[HashMap<String,StructType> structtable] returns [LinkedHashMap<String, Type> rtype = null]
+params[HashMap<String,StructType> structtable, HashMap<String,Type> vartable] returns [LinkedHashMap<String, Type> rtype = null]
    :  ^(PARAMS {System.out.println("params"); $rtype = new LinkedHashMap<String, Type>();} (rdecl=decl[structtable]
         {
-          if(!$rtype.containsKey($rdecl.rid))
+          if($rtype.containsKey($rdecl.rid))
+          {
+            EvilUtil.die("line " + $rdecl.linenumber + ": " + $rdecl.rid + " is already defined.");
+          }
+          if($vartable.containsKey($rdecl.rid) && !$vartable.get($rdecl.rid).global)
+          {
+            EvilUtil.die("line " + $rdecl.linenumber + ": " + $rdecl.rid + " is already defined.");
+          }
+          if($structtable.containsKey($rdecl.rid) && !$structtable.get($rdecl.rid).global)
           {
             EvilUtil.die("line " + $rdecl.linenumber + ": " + $rdecl.rid + " is already defined.");
           }
