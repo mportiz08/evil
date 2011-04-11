@@ -106,6 +106,7 @@ function[HashMap<String, FuncType> functable, HashMap<String,StructType> structt
            EvilUtil.die("line " + $rid.linenumber + ": " + $rid.rstring + " is already defined.");
          }
          FuncType func = new FuncType();
+         func.returntype = $rret.rtype;
          func.params.putAll($rparams.rtype);
          $functable.put($rid.rstring, func);
          HashMap<String,Type> copy_vartable = new HashMap<String,Type>();
@@ -178,7 +179,7 @@ statement[HashMap<String, FuncType> functable, HashMap<String,StructType> struct
    |  loop[functable,structtable,vartable,rret]
    |  delete[functable,structtable,vartable,rret]
    |  ret[functable,structtable,vartable,rret]
-   |  invocation[functable,structtable,vartable,rret]
+   |  expression[functable,structtable,vartable,rret]
    ;
    
 block[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
@@ -187,7 +188,7 @@ block[HashMap<String, FuncType> functable, HashMap<String,StructType> structtabl
    
 assignment[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
    :  ^(tnode=ASSIGN {/*System.out.println("assign");*/} rv=expression[functable,structtable,vartable,rret] lv=lvalue[functable,structtable,vartable,rret]
-         {
+         { 
            if($lv.rtype.isStruct())
            {
              if($rv.rtype.isStruct())
@@ -258,31 +259,6 @@ delete[HashMap<String, FuncType> functable, HashMap<String,StructType> structtab
    
 ret[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
    : ^(RETURN {/*System.out.println("ret");*/} (expression[functable,structtable,vartable,rret])?)
-   ;
-   
-invocation[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret]
-   :  ^(tnode=INVOKE {/*System.out.println("invoke: " + $tnode.text);*/} fid=id args=arguments[functable,structtable,vartable,rret]
-         {
-           if(!$functable.containsKey($fid.rstring))
-           {
-             EvilUtil.die("line " + $fid.linenumber + ": " + $fid.rstring + " has not been defined.");
-           }
-           FuncType temp = $functable.get($fid.rstring);
-           if(temp.params.values().size() != $args.arglist.size())
-           {
-              EvilUtil.die("line " + $fid.linenumber + ": wrong number of arguments in call to " + $fid.rstring);
-           }
-           int i = 0;
-           for(Type t : temp.params.values())
-           {
-             if(!(t.getClass().getName().equals($args.arglist.get(i).getClass().getName())))
-             {
-               EvilUtil.die("line " + $fid.linenumber + ": mismatched types in function call to " + $fid.rstring);
-             }
-             i++;
-           }
-         }
-       )
    ;
    
 lvalue [HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret] returns [Type rtype = null]
@@ -560,8 +536,31 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
    |  INTEGER {/*System.out.println("random expression");*/ $rtype = new IntType(); }
    |  TRUE {/*System.out.println("random expression");*/ $rtype = new BoolType();}
    |  FALSE {/*System.out.println("random expression");*/ $rtype = new BoolType(); }
-   |  ^(NEW {/*System.out.println("random expression");*/} id {$rtype = new StructType();})
-   |  NULL {/*System.out.println("random expression");*/ $rtype = new Type();}
+   |  ^(NEW {/*System.out.println("random expression");*/} rid=id {$rtype = new StructType();})
+   |  NULL {/*System.out.println("random expression");*/ $rtype = new StructType();}
+   |  ^(tnode=INVOKE {/*System.out.println("invoke: " + $tnode.text);*/} fid=id args=arguments[functable,structtable,vartable,rret]
+         {
+           if(!$functable.containsKey($fid.rstring))
+           {
+             EvilUtil.die("line " + $fid.linenumber + ": " + $fid.rstring + " has not been defined.");
+           }
+           FuncType temp = $functable.get($fid.rstring);
+           if(temp.params.values().size() != $args.arglist.size())
+           {
+              EvilUtil.die("line " + $fid.linenumber + ": wrong number of arguments in call to " + $fid.rstring);
+           }
+           int i = 0;
+           for(Type t : temp.params.values())
+           {
+             if(!(t.getClass().getName().equals($args.arglist.get(i).getClass().getName())))
+             {
+               EvilUtil.die("line " + $fid.linenumber + ": mismatched types in function call to " + $fid.rstring);
+             }
+             i++;
+           }
+           $rtype = $functable.get($fid.rstring).returntype;
+         }
+       )
    ;
    
 arguments[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret] returns [ArrayList<Type> arglist = null]
