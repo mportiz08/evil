@@ -44,6 +44,10 @@ public class Evil
          TypeCheck tparser = new TypeCheck(nodes);
 
          tparser.verify(new HashMap<String, FuncType>(), new HashMap<String, StructType>(), new HashMap<String, Type>());
+         
+         ILOC iloc = new ILOC(nodes);
+         
+         iloc.generate();
       }
       catch (org.antlr.runtime.RecognitionException e)
       {
