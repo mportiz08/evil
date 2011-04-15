@@ -10,3 +10,5 @@ Evil.tokens
 .DS_Store
 ._*
 output/
+ILOC.java
+ILOC.tokens

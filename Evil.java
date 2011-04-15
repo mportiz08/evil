@@ -45,6 +45,9 @@ public class Evil
 
          tparser.verify(new HashMap<String, FuncType>(), new HashMap<String, StructType>(), new HashMap<String, Type>());
          
+	 nodes = new CommonTreeNodeStream(t);
+         nodes.setTokenStream(tokens);
+
          ILOC iloc = new ILOC(nodes);
          
          iloc.generate();

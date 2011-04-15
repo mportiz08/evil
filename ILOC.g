@@ -13,6 +13,7 @@ options
    import java.util.Vector;
    import java.util.Iterator;
    import java.util.LinkedHashMap;
+   import java.util.ArrayList;
 }
 
 generate
@@ -28,7 +29,12 @@ declarations
    ;
 
 functions
-   :  ^(FUNCS function*)
+   :  ^(FUNCS{ArrayList<Block> blist = new ArrayList<Block>();Integer c = new Integer(0);} (rfun=function[c]{blist.add($rfun.rblock);})*)
+       {
+          for(Block b : blist){
+            System.out.println(b);
+          }
+       }
    ;
 
 type_sub
@@ -61,8 +67,8 @@ id
    : ID
    ;
 
-function
-   :  ^(FUN id params ^(RETTYPE return_type) localdeclarations statement_list)
+function[Integer c] returns [Block rblock = new Block()]
+   :  ^(FUN rid=ID{$rblock.name=$rid.text;} params ^(RETTYPE return_type) localdeclarations statement_list[rblock, c])
    ;
 
 localdeclarations
@@ -86,89 +92,89 @@ return_type
    |  VOID
    ;
 
-statement_list
-   :  ^(STMTS statement*)
+statement_list[Block b, Integer c]
+   :  ^(STMTS statement[b, c]*)
    ;
    
-statement
-   :  block
-   |  assignment
-   |  print
-   |  read
-   |  conditional
-   |  loop
-   |  delete
-   |  ret
-   |  expression
+statement[Block b, Integer c]
+   :  block[b, c]
+   |  assignment[b, c]
+   |  print[b, c]
+   |  read[b, c]
+   |  conditional[b, c]
+   |  loop[b, c]
+   |  delete[b, c]
+   |  ret[b, c]
+   |  expression[b, c]
    ;
    
-block
-   :  ^(BLOCK statement_list)
+block[Block b, Integer c]
+   :  ^(BLOCK statement_list[b, c])
    ;
    
-assignment
-   :  ^(ASSIGN expression lvalue)
+assignment[Block b, Integer c]
+   :  ^(ASSIGN expression[b, c] lvalue[b, c])
    ;
    
-print
-   :  ^(PRINT expression (ENDL)?)
+print[Block b, Integer c]
+   :  ^(PRINT expression[b, c] (ENDL)?)
    ;
    
-read
-   :  ^(READ lvalue)
+read[Block b, Integer c]
+   :  ^(READ lvalue[b, c])
    ;
    
-conditional
-   :  ^(IF expression block (block)?)
+conditional[Block b, Integer c]
+   :  ^(IF expression[b, c] block[b, c] (block[b, c])?)
    ;
    
-loop
-   :  ^(WHILE expression block expression)
+loop[Block b, Integer c]
+   :  ^(WHILE expression[b, c] block[b, c] expression[b, c])
    ;
  
-delete
-   :  ^(DELETE expression)
+delete[Block b, Integer c]
+   :  ^(DELETE expression[b, c])
    ;
    
-ret
-   : ^(RETURN (expression)?)
+ret[Block b, Integer c]
+   : ^(RETURN (expression[b, c])?)
    ;
    
-lvalue
+lvalue[Block b, Integer c]
    :  id
-   | ^(DOT lvalue id)
+   | ^(DOT lvalue[b, c] id)
    ;
    
-expression
-   : ^(AND expression expression)
-   | ^(OR expression expression)
-   | ^(EQ expression expression)
-   | ^(LT expression expression)
-   | ^(GT expression expression)
-   | ^(NE expression expression)
-   | ^(LE expression expression)
-   | ^(GE expression expression)
-   | ^(PLUS expression expression)
-   | ^(MINUS expression expression)
-   | ^(TIMES expression expression)
-   | ^(DIVIDE expression expression)
-   | ^(NOT expression)
-   | ^(NEG expression)
-   | ^(DOT expression id)
+expression[Block b, Integer c]
+   : ^(AND expression[b, c] expression[b, c])
+   | ^(OR expression[b, c] expression[b, c])
+   | ^(EQ expression[b, c] expression[b, c])
+   | ^(LT expression[b, c] expression[b, c])
+   | ^(GT expression[b, c] expression[b, c])
+   | ^(NE expression[b, c] expression[b, c])
+   | ^(LE expression[b, c] expression[b, c])
+   | ^(GE expression[b, c] expression[b, c])
+   | ^(PLUS expression[b, c] expression[b, c])
+   | ^(MINUS expression[b, c] expression[b, c])
+   | ^(TIMES expression[b, c] expression[b, c])
+   | ^(DIVIDE expression[b, c] expression[b, c])
+   | ^(NOT expression[b, c])
+   | ^(NEG expression[b, c])
+   | ^(DOT expression[b, c] id)
    |  id 
    |  INTEGER
    |  TRUE
    |  FALSE
    |  ^(NEW id)
    |  NULL
-   |  ^(INVOKE id arguments)
+   |  ^(INVOKE id arguments[b, c])
    ;
    
-arguments
-   :  arg_list
+arguments[Block b, Integer c]
+   :  arg_list[b, c]
    ;
    
-arg_list
+arg_list[Block b, Integer c]
    :  ARGS
-   |  ^(ARGS expression+)
+   |  ^(ARGS expression[b, c]+)
    ;
