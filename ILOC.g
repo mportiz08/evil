@@ -108,7 +108,7 @@ statement[Block b, Integer c]
    |  expression[b, c]
    ;
    
-block[Block b, Integer c]
+block[Block b, Integer c] returns [Block rblock]
    :  ^(BLOCK statement_list[b, c])
    ;
    
@@ -124,8 +124,22 @@ read[Block b, Integer c]
    :  ^(READ lvalue[b, c])
    ;
    
-conditional[Block b, Integer c]
-   :  ^(IF expression[b, c] block[b, c] (block[b, c])?)
+conditional[Block b, Integer c] returns [Block continueblock = new Block()]
+   @init
+   {
+      Block thenblock = new Block();
+      Block elseblock = new Block();
+   }
+   :  ^(IF expression[b, c] thenLast = block[b, c] (elseLast = block[b, c])?)
+       {
+          b.successors.add($thenLast.rblock);
+          if(elseLast == null){
+             b.successors.add(continueblock);
+          }
+          else{
+             b.successors.add($elseLast.rblock);
+          }
+       }
    ;
    
 loop[Block b, Integer c]
