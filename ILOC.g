@@ -130,17 +130,18 @@ conditional[Block b, Block exit, Integer c] returns [Block continueblock = new B
       Block thenblock = new Block();
       Block elseblock = new Block();
    }
-   :  ^(IF expression[b, exit, c]{c++; thenblock.name = "L" + c;} thenLast = block[thenblock, exit, c] {c++; elseblock.name = "L" + c;}(elseLast = block[elseblock, exit, c])?)
+   :  ^(IF expression[b, exit, c]{c++; thenblock.name = "L" + c + " (if-then)";} thenLast = block[thenblock, exit, c] {elseblock.name = "L" + c + " (if-else)";}(elseLast = block[elseblock, exit, c])?)
        {
-          b.successors.add($thenLast.rblock);
+          b.successors.add(thenblock);
           if(elseLast == null){
              b.successors.add(continueblock);
           }
           else{
-             b.successors.add($elseLast.rblock);
+             b.successors.add(elseblock);
+             $elseLast.rblock.successors.add(continueblock);
           }
-          c++;
-          continueblock.name = "L" + c;
+          continueblock.name = "L" + c + " (cont)";
+          $thenLast.rblock.successors.add(continueblock);
        }
    ;
    
@@ -153,7 +154,7 @@ delete[Block b, Block exit, Integer c]
    ;
    
 ret[Block b, Block exit, Integer c] returns [Block rblock]
-   : ^(RETURN (expression[b, exit, c])?){b.successors.add(exit);}
+   : ^(RETURN (expression[b, exit, c])?){b.successors.add(exit); $rblock = exit;}
    ;
    
 lvalue[Block b, Block exit, Integer c]

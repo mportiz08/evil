@@ -1,0 +1,22 @@
+fun blah(int a) void
+{
+  if(a < 5) {
+    return;
+  }
+  return;
+}
+
+fun main() int
+{
+  int a;
+  
+  a = 5;
+  if(a < 6) {
+    print a;
+  } else {
+    print (a + 3);
+  }
+  a = 1;
+  
+  return a;
+}

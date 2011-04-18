@@ -10,12 +10,26 @@ public class Block
 
   public Block()
   {
+    name = "exit";
     instructions = new ArrayList<Instruction>();
     successors = new ArrayList<Block>();
     predecessors = new ArrayList<Block>();
   }
   
   public String toString(){
-    return name;
+    
+    return name + ":\n\t" + subTreeString();
+  }
+  
+  private String subTreeString()
+  {
+    String str = "";
+    for(Block b : successors)
+    {
+      str += b.toString();
+    }
+    //System.out.println("finished subtree");
+    
+    return str;
   }
 }
