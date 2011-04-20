@@ -32,7 +32,7 @@ functions
    :  ^(FUNCS{ArrayList<Block> blist = new ArrayList<Block>();Integer c = new Integer(0);} (rfun=function[c]{blist.add($rfun.rblock);})*)
        {
           for(Block b : blist){
-            System.out.println(b);
+            b.printTree();
           }
        }
    ;
@@ -93,7 +93,7 @@ return_type
    ;
 
 statement_list[Block b, Block exit, Integer c] returns [Block rblock]
-   :  ^(STMTS (finalblock=statement[b, exit, c])*){rblock = $finalblock.rblock;}
+   :  ^(STMTS (finalblock=statement[b, exit, c]{b = $finalblock.rblock;})*){rblock = $finalblock.rblock;}
    ;
    
 statement[Block b, Block exit, Integer c] returns [Block rblock]
@@ -138,10 +138,14 @@ conditional[Block b, Block exit, Integer c] returns [Block continueblock = new B
           }
           else{
              b.successors.add(elseblock);
-             $elseLast.rblock.successors.add(continueblock);
+             if(!$thenLast.rblock.name.equals("exit")){
+               $elseLast.rblock.successors.add(continueblock);
+             }
           }
           continueblock.name = "L" + c + " (cont)";
-          $thenLast.rblock.successors.add(continueblock);
+          if(!$thenLast.rblock.name.equals("exit")){
+            $thenLast.rblock.successors.add(continueblock);
+          }
        }
    ;
    

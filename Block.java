@@ -7,18 +7,32 @@ public class Block
   public ArrayList<Block> predecessors;
   
   public String name;
+  
+  boolean visited;
 
   public Block()
   {
+    visited = false;
     name = "exit";
     instructions = new ArrayList<Instruction>();
     successors = new ArrayList<Block>();
     predecessors = new ArrayList<Block>();
   }
   
+  public void printTree(){
+    System.out.println(name + ":" + subTreeString() + "\n");
+    for(Block b : successors)
+    {
+      if(!b.visited){
+        b.printTree();
+      }
+      b.visited = true;
+    }
+  }
+  
   public String toString(){
+    return name + ":" + subTreeString() + "\n";
     
-    return name + ":\n\t" + subTreeString();
   }
   
   private String subTreeString()
@@ -26,7 +40,7 @@ public class Block
     String str = "";
     for(Block b : successors)
     {
-      str += b.toString();
+      str += (b.name + ", ");
     }
     //System.out.println("finished subtree");
     
