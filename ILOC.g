@@ -29,7 +29,7 @@ declarations
    ;
 
 functions
-   :  ^(FUNCS{ArrayList<Block> blist = new ArrayList<Block>();Integer c = new Integer(0);} (rfun=function[c]{blist.add($rfun.rblock);})*)
+   :  ^(FUNCS{ArrayList<Block> blist = new ArrayList<Block>();} (rfun=function {blist.add($rfun.rblock);})*)
        {
           for(Block b : blist){
             b.printTree();
@@ -67,8 +67,8 @@ id
    : ID
    ;
 
-function[Integer c] returns [Block rblock = new Block()]
-   :  ^(FUN rid=ID{$rblock.name=$rid.text;} params ^(RETTYPE return_type) localdeclarations statement_list[rblock, new Block(), c])
+function returns [Block rblock = new Block()]
+   :  ^(FUN rid=ID{$rblock.name=$rid.text;} params ^(RETTYPE return_type) localdeclarations statement_list[rblock, new Block()])
    ;
 
 localdeclarations
@@ -92,45 +92,47 @@ return_type
    |  VOID
    ;
 
-statement_list[Block b, Block exit, Integer c] returns [Block rblock]
-   :  ^(STMTS (finalblock=statement[b, exit, c]{b = $finalblock.rblock;})*){rblock = $finalblock.rblock;}
+statement_list[Block b, Block exit] returns [Block rblock]
+   :  ^(STMTS (finalblock=statement[b, exit]{b = $finalblock.rblock;})*){rblock = $finalblock.rblock;}
    ;
    
-statement[Block b, Block exit, Integer c] returns [Block rblock]
-   :  returnblock=block[b, exit, c]{$rblock = $returnblock.rblock;}
-   |  assignment[b, exit, c]{$rblock = b;}
-   |  print[b, exit, c]{$rblock = b;}
-   |  read[b, exit, c]{$rblock = b;}
-   |  returnblock=conditional[b, exit, c]{$rblock = $returnblock.rblock;}
-   |  returnblock=loop[b, exit, c]{$rblock = $returnblock.rblock;}
-   |  delete[b, exit, c]{$rblock = b;}
-   |  returnblock=ret[b, exit, c]{$rblock = $returnblock.rblock;}
-   |  expression[b, exit, c]{$rblock = b;}
+statement[Block b, Block exit] returns [Block rblock]
+   :  returnblock=block[b, exit]{$rblock = $returnblock.rblock;}
+   |  assignment[b, exit]{$rblock = b;}
+   |  print[b, exit]{$rblock = b;}
+   |  read[b, exit]{$rblock = b;}
+   |  returnblock=conditional[b, exit]{$rblock = $returnblock.rblock;}
+   |  returnblock=loop[b, exit]{$rblock = $returnblock.rblock;}
+   |  delete[b, exit]{$rblock = b;}
+   |  returnblock=ret[b, exit]{$rblock = $returnblock.rblock;}
+   |  expression[b, exit]{$rblock = b;}
    ;
    
-block[Block b, Block exit, Integer c] returns [Block rblock]
-   :  ^(BLOCK finalblock=statement_list[b, exit, c]{rblock = $finalblock.rblock;})
+block[Block b, Block exit] returns [Block rblock]
+   :  ^(BLOCK finalblock=statement_list[b, exit]{rblock = $finalblock.rblock;})
    ;
    
-assignment[Block b, Block exit, Integer c]
-   :  ^(ASSIGN expression[b, exit, c] lvalue[b, exit, c])
+assignment[Block b, Block exit]
+   :  ^(ASSIGN expression[b, exit] lvalue[b, exit])
    ;
    
-print[Block b, Block exit, Integer c]
-   :  ^(PRINT expression[b, exit, c] (ENDL)?)
+print[Block b, Block exit]
+   :  ^(PRINT expression[b, exit] (ENDL)?)
    ;
    
-read[Block b, Block exit, Integer c]
-   :  ^(READ lvalue[b, exit, c])
+read[Block b, Block exit]
+   :  ^(READ lvalue[b, exit])
    ;
    
-conditional[Block b, Block exit, Integer c] returns [Block continueblock = new Block()]
+conditional[Block b, Block exit] returns [Block continueblock = new Block()]
    @init
    {
+      Block.counter++;
+      int c = Block.counter;
       Block thenblock = new Block();
       Block elseblock = new Block();
    }
-   :  ^(IF expression[b, exit, c]{c++; thenblock.name = "L" + c + " (if-then)";} thenLast = block[thenblock, exit, c] {elseblock.name = "L" + c + " (if-else)";}(elseLast = block[elseblock, exit, c])?)
+   :  ^(IF expression[b, exit]{thenblock.name = "L" + c + " (if-then)";} thenLast = block[thenblock, exit] {elseblock.name = "L" + c + " (if-else)";}(elseLast = block[elseblock, exit])?)
        {
           b.successors.add(thenblock);
           if(elseLast == null){
@@ -149,16 +151,18 @@ conditional[Block b, Block exit, Integer c] returns [Block continueblock = new B
        }
    ;
    
-loop[Block b, Block exit, Integer c] returns [Block continueblock = new Block()]
+loop[Block b, Block exit] returns [Block continueblock = new Block()]
    @init
    {
+      Block.counter++;
+      int c = Block.counter;
       Block expblock = new Block();
       expblock.name = "L" + c + " (while-exp)";
       Block execblock = new Block();
       execblock.name = "L" + c + " (while-exec)";
       continueblock.name = "L" + c + " (while-cont)";
    }
-   :  ^(WHILE expression[expblock, exit, c] lastexec=block[execblock, exit, c] expression[new Block(), exit, c])
+   :  ^(WHILE expression[expblock, exit] lastexec=block[execblock, exit] expression[new Block(), exit])
        {
          b.successors.add(expblock);
          expblock.successors.add(execblock);
@@ -167,49 +171,49 @@ loop[Block b, Block exit, Integer c] returns [Block continueblock = new Block()]
        }
    ;
  
-delete[Block b, Block exit, Integer c]
-   :  ^(DELETE expression[b, exit, c])
+delete[Block b, Block exit]
+   :  ^(DELETE expression[b, exit])
    ;
    
-ret[Block b, Block exit, Integer c] returns [Block rblock]
-   : ^(RETURN (expression[b, exit, c])?){b.successors.add(exit); $rblock = exit;}
+ret[Block b, Block exit] returns [Block rblock]
+   : ^(RETURN (expression[b, exit])?){b.successors.add(exit); $rblock = exit;}
    ;
    
-lvalue[Block b, Block exit, Integer c]
+lvalue[Block b, Block exit]
    :  id
-   | ^(DOT lvalue[b, exit, c] id)
+   | ^(DOT lvalue[b, exit] id)
    ;
    
-expression[Block b, Block exit, Integer c]
-   : ^(AND expression[b, exit, c] expression[b, exit, c])
-   | ^(OR expression[b, exit, c] expression[b, exit, c])
-   | ^(EQ expression[b, exit, c] expression[b, exit, c])
-   | ^(LT expression[b, exit, c] expression[b, exit, c])
-   | ^(GT expression[b, exit, c] expression[b, exit, c])
-   | ^(NE expression[b, exit, c] expression[b, exit, c])
-   | ^(LE expression[b, exit, c] expression[b, exit, c])
-   | ^(GE expression[b, exit, c] expression[b, exit, c])
-   | ^(PLUS expression[b, exit, c] expression[b, exit, c])
-   | ^(MINUS expression[b, exit, c] expression[b, exit, c])
-   | ^(TIMES expression[b, exit, c] expression[b, exit, c])
-   | ^(DIVIDE expression[b, exit, c] expression[b, exit, c])
-   | ^(NOT expression[b, exit, c])
-   | ^(NEG expression[b, exit, c])
-   | ^(DOT expression[b, exit, c] id)
+expression[Block b, Block exit]
+   : ^(AND expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("and", new Register(), new Register(), new Register()));})
+   | ^(OR expression[b, exit] expression[b, exit])
+   | ^(EQ expression[b, exit] expression[b, exit])
+   | ^(LT expression[b, exit] expression[b, exit])
+   | ^(GT expression[b, exit] expression[b, exit])
+   | ^(NE expression[b, exit] expression[b, exit])
+   | ^(LE expression[b, exit] expression[b, exit])
+   | ^(GE expression[b, exit] expression[b, exit])
+   | ^(PLUS expression[b, exit] expression[b, exit])
+   | ^(MINUS expression[b, exit] expression[b, exit])
+   | ^(TIMES expression[b, exit] expression[b, exit])
+   | ^(DIVIDE expression[b, exit] expression[b, exit])
+   | ^(NOT expression[b, exit])
+   | ^(NEG expression[b, exit])
+   | ^(DOT expression[b, exit] id)
    |  id 
    |  INTEGER
    |  TRUE
    |  FALSE
    |  ^(NEW id)
    |  NULL
-   |  ^(INVOKE id arguments[b, exit, c])
+   |  ^(INVOKE id arguments[b, exit])
    ;
    
-arguments[Block b, Block exit, Integer c]
-   :  arg_list[b, exit, c]
+arguments[Block b, Block exit]
+   :  arg_list[b, exit]
    ;
    
-arg_list[Block b, Block exit, Integer c]
+arg_list[Block b, Block exit]
    :  ARGS
-   |  ^(ARGS expression[b, exit, c]+)
+   |  ^(ARGS expression[b, exit]+)
    ;

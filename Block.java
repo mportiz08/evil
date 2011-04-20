@@ -2,6 +2,8 @@ import java.util.ArrayList;
 
 public class Block
 {
+  public static int counter = 0;
+  
   public ArrayList<Instruction> instructions;
   public ArrayList<Block> successors;
   public ArrayList<Block> predecessors;

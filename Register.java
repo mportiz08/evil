@@ -1,14 +1,16 @@
 public class Register extends Operand
 {
-  public int number;
+  public static int counter = 0;
+  private int num;
   
-  public Register(int number)
+  public Register()
   {
-    this.number = number;
+    counter++;
+    num = counter;
   }
   
   public String toString()
   {
-    return new String("r" + number);
+    return new String("r" + num);
   }
 }

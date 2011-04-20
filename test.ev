@@ -11,6 +11,9 @@ fun looptest() void
   while(true) {
     print 7;
   }
+  if(true) {
+    print 3;
+  }
   
   return;
 }
