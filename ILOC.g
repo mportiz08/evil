@@ -149,8 +149,22 @@ conditional[Block b, Block exit, Integer c] returns [Block continueblock = new B
        }
    ;
    
-loop[Block b, Block exit, Integer c] returns [Block rblock]
-   :  ^(WHILE expression[b, exit, c] block[b, exit, c] expression[b, exit, c])
+loop[Block b, Block exit, Integer c] returns [Block continueblock = new Block()]
+   @init
+   {
+      Block expblock = new Block();
+      expblock.name = "L" + c + " (while-exp)";
+      Block execblock = new Block();
+      execblock.name = "L" + c + " (while-exec)";
+      continueblock.name = "L" + c + " (while-cont)";
+   }
+   :  ^(WHILE expression[b, exit, c] lastexec=block[b, exit, c] expression[b, exit, c])
+       {
+         b.successors.add(expblock);
+         expblock.successors.add(execblock);
+         expblock.successors.add(continueblock);
+         $lastexec.rblock.successors.add(expblock);
+       }
    ;
  
 delete[Block b, Block exit, Integer c]
