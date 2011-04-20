@@ -6,7 +6,7 @@ fun blah(int a) void
   return;
 }
 
-fun loop-test() void
+fun looptest() void
 {
   while(true) {
     print 7;

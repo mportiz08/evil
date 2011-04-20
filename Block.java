@@ -24,9 +24,9 @@ public class Block
     for(Block b : successors)
     {
       if(!b.visited){
+        b.visited = true;
         b.printTree();
       }
-      b.visited = true;
     }
   }
   

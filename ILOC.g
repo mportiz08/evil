@@ -158,7 +158,7 @@ loop[Block b, Block exit, Integer c] returns [Block continueblock = new Block()]
       execblock.name = "L" + c + " (while-exec)";
       continueblock.name = "L" + c + " (while-cont)";
    }
-   :  ^(WHILE expression[b, exit, c] lastexec=block[b, exit, c] expression[b, exit, c])
+   :  ^(WHILE expression[expblock, exit, c] lastexec=block[execblock, exit, c] expression[new Block(), exit, c])
        {
          b.successors.add(expblock);
          expblock.successors.add(execblock);
