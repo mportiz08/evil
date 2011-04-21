@@ -117,11 +117,22 @@ assignment[Block b, Block exit]
    ;
    
 print[Block b, Block exit]
-   :  ^(PRINT expression[b, exit] (ENDL)?)
+   :  ^(PRINT expression[b, exit] (println = ENDL)?)
+      {
+        if(println == null){
+          b.instructions.add(new IOInstruction("print", new Register()));
+        }
+        else{
+          b.instructions.add(new IOInstruction("println", new Register()));
+        }
+      }
    ;
    
 read[Block b, Block exit]
    :  ^(READ lvalue[b, exit])
+      {
+        b.instructions.add(new IOInstruction("read", new Register()));
+      }
    ;
    
 conditional[Block b, Block exit] returns [Block continueblock = new Block()]
@@ -186,19 +197,19 @@ lvalue[Block b, Block exit]
    
 expression[Block b, Block exit]
    : ^(AND expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("and", new Register(), new Register(), new Register()));})
-   | ^(OR expression[b, exit] expression[b, exit])
-   | ^(EQ expression[b, exit] expression[b, exit])
-   | ^(LT expression[b, exit] expression[b, exit])
-   | ^(GT expression[b, exit] expression[b, exit])
-   | ^(NE expression[b, exit] expression[b, exit])
-   | ^(LE expression[b, exit] expression[b, exit])
-   | ^(GE expression[b, exit] expression[b, exit])
-   | ^(PLUS expression[b, exit] expression[b, exit])
-   | ^(MINUS expression[b, exit] expression[b, exit])
-   | ^(TIMES expression[b, exit] expression[b, exit])
-   | ^(DIVIDE expression[b, exit] expression[b, exit])
-   | ^(NOT expression[b, exit])
-   | ^(NEG expression[b, exit])
+   | ^(OR expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("or", new Register(), new Register(), new Register()));})
+   | ^(EQ expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("moveq", new Register(), new Register(), new Register()));})
+   | ^(LT expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("movlt", new Register(), new Register(), new Register()));})
+   | ^(GT expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("movgt", new Register(), new Register(), new Register()));})
+   | ^(NE expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("movne", new Register(), new Register(), new Register()));})
+   | ^(LE expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("movle", new Register(), new Register(), new Register()));})
+   | ^(GE expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("movge", new Register(), new Register(), new Register()));})
+   | ^(PLUS expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("add", new Register(), new Register(), new Register()));})
+   | ^(MINUS expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("sub", new Register(), new Register(), new Register()));})
+   | ^(TIMES expression[b, exit] expression[b, exit]  {b.instructions.add(new ArithmeticInstruction("mult", new Register(), new Register(), new Register()));})
+   | ^(DIVIDE expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("div", new Register(), new Register(), new Register()));})
+   | ^(NOT expression[b, exit] {b.instructions.add(new ArithmeticInstruction("xori", new Register(), new Register(), new Register()));/*xori r1, true, dest*/})
+   | ^(NEG expression[b, exit]  {b.instructions.add(new ArithmeticInstruction("mult", new Register(), new Register(), new Register()));/*multi r1, -1, dest*/})
    | ^(DOT expression[b, exit] id)
    |  id 
    |  INTEGER
