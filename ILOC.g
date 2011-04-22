@@ -29,7 +29,7 @@ types
    ;
 
 declarations[HashMap<String, Register> regtable]
-   :  ^(DECLS declaration*)
+   :  ^(DECLS (declaration[regtable])*)
    ;
 
 functions[HashMap<String, Register> regtable]
@@ -53,12 +53,16 @@ nested_decl
    :  (decl[new HashMap<String, Register>()])+
    ;
    
-declaration
-   :  ^(DECLLIST ^(TYPE type) id_list)
+declaration[HashMap<String, Register> regtable]
+   :  ^(DECLLIST ^(TYPE type) id_list[regtable])
    ;
    
-id_list
-   : id+
+id_list[HashMap<String, Register> regtable]
+   : (rid=id
+      {
+         $regtable.put($rid.rstring, new Register($rid.rstring));
+      }
+   )+
    ;
 
 type
@@ -67,8 +71,8 @@ type
    |  ^(STRUCT id)
    ;
 
-id
-   : ID
+id returns [String rstring = null]
+   : ^(tnode=ID {$rstring = $tnode.text;})
    ;
 
 function[HashMap<String, Register> regtable] returns [Block rblock = new Block()]
