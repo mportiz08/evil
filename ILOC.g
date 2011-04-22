@@ -17,19 +17,23 @@ options
 }
 
 generate
-   :  ^(PROGRAM types declarations functions)
+   @init
+   {
+      HashMap<String, Register> regtable = new HashMap<String, Register>();
+   }
+   :  ^(PROGRAM types declarations[regtable] functions[regtable])
    ;
 
 types
    :  ^(TYPES type_sub*)
    ;
 
-declarations
+declarations[HashMap<String, Register> regtable]
    :  ^(DECLS declaration*)
    ;
 
-functions
-   :  ^(FUNCS{ArrayList<Block> blist = new ArrayList<Block>();} (rfun=function {blist.add($rfun.rblock);})*)
+functions[HashMap<String, Register> regtable]
+   :  ^(FUNCS{ArrayList<Block> blist = new ArrayList<Block>();} (rfun=function[regtable] {blist.add($rfun.rblock);})*)
        {
           for(Block b : blist){
             b.printTree();
@@ -41,12 +45,12 @@ type_sub
    :  ^(STRUCT id nested_decl)
    ;
 
-decl
+decl[HashMap<String, Register> regtable]
    :  ^(DECL ^(TYPE type) id)
    ;
 
 nested_decl
-   :  decl+
+   :  (decl[new HashMap<String, Register>()])+
    ;
    
 declaration
@@ -67,24 +71,28 @@ id
    : ID
    ;
 
-function returns [Block rblock = new Block()]
-   :  ^(FUN rid=ID{$rblock.name=$rid.text;} params ^(RETTYPE return_type) localdeclarations statement_list[rblock, new Block()])
+function[HashMap<String, Register> regtable] returns [Block rblock = new Block()]
+   @init
+   {
+     HashMap<String, Register> regtable_copy = new HashMap<String, Register>(regtable);
+   }
+   :  ^(FUN rid=ID{$rblock.name=$rid.text;} params[regtable_copy] ^(RETTYPE return_type) localdeclarations[regtable_copy] statement_list[regtable_copy, rblock, new Block()])
    ;
 
-localdeclarations
-   :  ^(DECLS localdeclaration*)
+localdeclarations[HashMap<String, Register> regtable_copy]
+   :  ^(DECLS (localdeclaration[regtable_copy])*)
    ;
 
-localdeclaration
-   :  ^(DECLLIST ^(TYPE type) localid_list)
+localdeclaration[HashMap<String, Register> regtable]
+   :  ^(DECLLIST ^(TYPE type) localid_list[regtable])
    ;
    
-localid_list
+localid_list[HashMap<String, Register> regtable]
    : id+
    ;
 
-params
-   :  ^(PARAMS decl*)
+params[HashMap<String, Register> regtable]
+   :  ^(PARAMS (decl[regtable])*)
    ;
 
 return_type
@@ -92,32 +100,32 @@ return_type
    |  VOID
    ;
 
-statement_list[Block b, Block exit] returns [Block rblock]
-   :  ^(STMTS (finalblock=statement[b, exit]{b = $finalblock.rblock;})*){rblock = $finalblock.rblock;}
+statement_list[HashMap<String, Register> regtable, Block b, Block exit] returns [Block rblock]
+   :  ^(STMTS (finalblock=statement[regtable, b, exit]{b = $finalblock.rblock;})*){rblock = $finalblock.rblock;}
    ;
    
-statement[Block b, Block exit] returns [Block rblock]
-   :  returnblock=block[b, exit]{$rblock = $returnblock.rblock;}
-   |  assignment[b, exit]{$rblock = b;}
-   |  print[b, exit]{$rblock = b;}
-   |  read[b, exit]{$rblock = b;}
-   |  returnblock=conditional[b, exit]{$rblock = $returnblock.rblock;}
-   |  returnblock=loop[b, exit]{$rblock = $returnblock.rblock;}
-   |  delete[b, exit]{$rblock = b;}
-   |  returnblock=ret[b, exit]{$rblock = $returnblock.rblock;}
-   |  expression[b, exit]{$rblock = b;}
+statement[HashMap<String, Register> regtable, Block b, Block exit] returns [Block rblock]
+   :  returnblock=block[regtable, b, exit]{$rblock = $returnblock.rblock;}
+   |  assignment[regtable, b, exit]{$rblock = b;}
+   |  print[regtable, b, exit]{$rblock = b;}
+   |  read[regtable, b, exit]{$rblock = b;}
+   |  returnblock=conditional[regtable, b, exit]{$rblock = $returnblock.rblock;}
+   |  returnblock=loop[regtable, b, exit]{$rblock = $returnblock.rblock;}
+   |  delete[regtable, b, exit]{$rblock = b;}
+   |  returnblock=ret[regtable, b, exit]{$rblock = $returnblock.rblock;}
+   |  expression[regtable, b, exit]{$rblock = b;}
    ;
    
-block[Block b, Block exit] returns [Block rblock]
-   :  ^(BLOCK finalblock=statement_list[b, exit]{rblock = $finalblock.rblock;})
+block[HashMap<String, Register> regtable, Block b, Block exit] returns [Block rblock]
+   :  ^(BLOCK finalblock=statement_list[regtable, b, exit]{rblock = $finalblock.rblock;})
    ;
    
-assignment[Block b, Block exit]
-   :  ^(ASSIGN expression[b, exit] lvalue[b, exit])
+assignment[HashMap<String, Register> regtable, Block b, Block exit]
+   :  ^(ASSIGN expression[regtable, b, exit] lvalue[regtable, b, exit])
    ;
    
-print[Block b, Block exit]
-   :  ^(PRINT expression[b, exit] (println = ENDL)?)
+print[HashMap<String, Register> regtable, Block b, Block exit]
+   :  ^(PRINT expression[regtable, b, exit] (println = ENDL)?)
       {
         if(println == null){
           b.instructions.add(new IOInstruction("print", new Register()));
@@ -128,14 +136,14 @@ print[Block b, Block exit]
       }
    ;
    
-read[Block b, Block exit]
-   :  ^(READ lvalue[b, exit])
+read[HashMap<String, Register> regtable, Block b, Block exit]
+   :  ^(READ lvalue[regtable, b, exit])
       {
         b.instructions.add(new IOInstruction("read", new Register()));
       }
    ;
    
-conditional[Block b, Block exit] returns [Block continueblock = new Block()]
+conditional[HashMap<String, Register> regtable, Block b, Block exit] returns [Block continueblock = new Block()]
    @init
    {
       Block.counter++;
@@ -143,7 +151,7 @@ conditional[Block b, Block exit] returns [Block continueblock = new Block()]
       Block thenblock = new Block();
       Block elseblock = new Block();
    }
-   :  ^(IF expression[b, exit]{thenblock.name = "L" + c + " (if-then)";} thenLast = block[thenblock, exit] {elseblock.name = "L" + c + " (if-else)";}(elseLast = block[elseblock, exit])?)
+   :  ^(IF expression[regtable, b, exit]{thenblock.name = "L" + c + " (if-then)";} thenLast = block[regtable, thenblock, exit] {elseblock.name = "L" + c + " (if-else)";}(elseLast = block[regtable, elseblock, exit])?)
        {
           b.successors.add(thenblock);
           if(elseLast == null){
@@ -162,7 +170,7 @@ conditional[Block b, Block exit] returns [Block continueblock = new Block()]
        }
    ;
    
-loop[Block b, Block exit] returns [Block continueblock = new Block()]
+loop[HashMap<String, Register> regtable, Block b, Block exit] returns [Block continueblock = new Block()]
    @init
    {
       Block.counter++;
@@ -173,7 +181,7 @@ loop[Block b, Block exit] returns [Block continueblock = new Block()]
       execblock.name = "L" + c + " (while-exec)";
       continueblock.name = "L" + c + " (while-cont)";
    }
-   :  ^(WHILE expression[expblock, exit] lastexec=block[execblock, exit] expression[new Block(), exit])
+   :  ^(WHILE expression[regtable, expblock, exit] lastexec=block[regtable, execblock, exit] expression[regtable, new Block(), exit])
        {
          b.successors.add(expblock);
          expblock.successors.add(execblock);
@@ -182,49 +190,49 @@ loop[Block b, Block exit] returns [Block continueblock = new Block()]
        }
    ;
  
-delete[Block b, Block exit]
-   :  ^(DELETE expression[b, exit])
+delete[HashMap<String, Register> regtable, Block b, Block exit]
+   :  ^(DELETE expression[regtable, b, exit])
    ;
    
-ret[Block b, Block exit] returns [Block rblock]
-   : ^(RETURN (expression[b, exit])?){b.successors.add(exit); $rblock = exit;}
+ret[HashMap<String, Register> regtable, Block b, Block exit] returns [Block rblock]
+   : ^(RETURN (expression[regtable, b, exit])?){b.successors.add(exit); $rblock = exit;}
    ;
    
-lvalue[Block b, Block exit]
+lvalue[HashMap<String, Register> regtable, Block b, Block exit]
    :  id
-   | ^(DOT lvalue[b, exit] id)
+   | ^(DOT lvalue[regtable, b, exit] id)
    ;
    
-expression[Block b, Block exit]
-   : ^(AND expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("and", new Register(), new Register(), new Register()));})
-   | ^(OR expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("or", new Register(), new Register(), new Register()));})
-   | ^(EQ expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("moveq", new Register(), new Register(), new Register()));})
-   | ^(LT expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("movlt", new Register(), new Register(), new Register()));})
-   | ^(GT expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("movgt", new Register(), new Register(), new Register()));})
-   | ^(NE expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("movne", new Register(), new Register(), new Register()));})
-   | ^(LE expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("movle", new Register(), new Register(), new Register()));})
-   | ^(GE expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("movge", new Register(), new Register(), new Register()));})
-   | ^(PLUS expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("add", new Register(), new Register(), new Register()));})
-   | ^(MINUS expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("sub", new Register(), new Register(), new Register()));})
-   | ^(TIMES expression[b, exit] expression[b, exit]  {b.instructions.add(new ArithmeticInstruction("mult", new Register(), new Register(), new Register()));})
-   | ^(DIVIDE expression[b, exit] expression[b, exit] {b.instructions.add(new ArithmeticInstruction("div", new Register(), new Register(), new Register()));})
-   | ^(NOT expression[b, exit] {b.instructions.add(new ArithmeticInstruction("xori", new Register(), new Register(), new Register()));/*xori r1, true, dest*/})
-   | ^(NEG expression[b, exit]  {b.instructions.add(new ArithmeticInstruction("mult", new Register(), new Register(), new Register()));/*multi r1, -1, dest*/})
-   | ^(DOT expression[b, exit] id)
+expression[HashMap<String, Register> regtable, Block b, Block exit]
+   : ^(AND expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("and", new Register(), new Register(), new Register()));})
+   | ^(OR expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("or", new Register(), new Register(), new Register()));})
+   | ^(EQ expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("moveq", new Register(), new Register(), new Register()));})
+   | ^(LT expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movlt", new Register(), new Register(), new Register()));})
+   | ^(GT expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movgt", new Register(), new Register(), new Register()));})
+   | ^(NE expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movne", new Register(), new Register(), new Register()));})
+   | ^(LE expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movle", new Register(), new Register(), new Register()));})
+   | ^(GE expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movge", new Register(), new Register(), new Register()));})
+   | ^(PLUS expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("add", new Register(), new Register(), new Register()));})
+   | ^(MINUS expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("sub", new Register(), new Register(), new Register()));})
+   | ^(TIMES expression[regtable, b, exit] expression[regtable, b, exit]  {b.instructions.add(new ArithmeticInstruction("mult", new Register(), new Register(), new Register()));})
+   | ^(DIVIDE expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("div", new Register(), new Register(), new Register()));})
+   | ^(NOT expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("xori", new Register(), new Register(), new Register()));/*xori r1, true, dest*/})
+   | ^(NEG expression[regtable, b, exit]  {b.instructions.add(new ArithmeticInstruction("mult", new Register(), new Register(), new Register()));/*multi r1, -1, dest*/})
+   | ^(DOT expression[regtable, b, exit] id)
    |  id 
    |  INTEGER
    |  TRUE
    |  FALSE
    |  ^(NEW id)
    |  NULL
-   |  ^(INVOKE id arguments[b, exit])
+   |  ^(INVOKE id arguments[regtable, b, exit])
    ;
    
-arguments[Block b, Block exit]
-   :  arg_list[b, exit]
+arguments[HashMap<String, Register> regtable, Block b, Block exit]
+   :  arg_list[regtable, b, exit]
    ;
    
-arg_list[Block b, Block exit]
+arg_list[HashMap<String, Register> regtable, Block b, Block exit]
    :  ARGS
-   |  ^(ARGS expression[b, exit]+)
+   |  ^(ARGS expression[regtable, b, exit]+)
    ;
