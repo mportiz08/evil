@@ -81,8 +81,20 @@ function[HashMap<String, Register> regtable] returns [Block rblock = new Block()
    @init
    {
      HashMap<String, Register> regtable_copy = new HashMap<String, Register>(regtable);
+     Block exit = new Block();
    }
-   :  ^(FUN rid=ID{$rblock.name=$rid.text;} params[regtable_copy] ^(RETTYPE return_type) localdeclarations[regtable_copy] statement_list[regtable_copy, rblock, new Block()])
+   :  ^(FUN rid=ID{$rblock.name=$rid.text;} params[regtable_copy] ^(RETTYPE isVoid=return_type) localdeclarations[regtable_copy] finalblk=statement_list[regtable_copy, rblock, exit]
+         { 
+           if($finalblk.rblock != null && $isVoid.isVoid)
+           {
+             $finalblk.rblock.successors.add(exit);
+           }
+           else if($isVoid.isVoid)
+           {
+             rblock.successors.add(exit);
+           }
+         }
+       )
    ;
 
 localdeclarations[HashMap<String, Register> regtable_copy]
@@ -101,9 +113,9 @@ params[HashMap<String, Register> regtable]
    :  ^(PARAMS (decl[regtable])*)
    ;
 
-return_type
+return_type returns [boolean isVoid = false]
    :  type
-   |  VOID
+   |  VOID{isVoid = true;}
    ;
 
 statement_list[HashMap<String, Register> regtable, Block b, Block exit] returns [Block rblock]
