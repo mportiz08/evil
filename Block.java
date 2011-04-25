@@ -35,14 +35,15 @@ public class Block
   public void printInstructions()
   {
     System.out.println(name + ":");
+    for(Instruction i : instructions)
+    {
+      System.out.println(i);
+    }
     for(Block b : successors)
     {
       if(!b.visited){
         b.visited = true;
-        for(Instruction i : instructions)
-        {
-          System.out.println(i);
-        }
+        b.printInstructions();
       }
     }
   }

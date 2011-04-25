@@ -175,22 +175,29 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit] returns [Bl
       Block thenblock = new Block();
       Block elseblock = new Block();
    }
-   :  ^(IF expression[regtable, b, exit]{thenblock.name = "L" + c + " (if-then)";} thenLast = block[regtable, thenblock, exit] {elseblock.name = "L" + c + " (if-else)";}(elseLast = block[regtable, elseblock, exit])?)
+   :  ^(IF reg=expression[regtable, b, exit]{thenblock.name = "L" + c + " (if-then)";} thenLast = block[regtable, thenblock, exit] {elseblock.name = "L" + c + " (if-else)";}(elseLast = block[regtable, elseblock, exit])?)
        {
+          Register condition = new Register();
+          b.instructions.add(new LoadInstruction("loadi", "true", condition));
+          b.instructions.add(new ComparisonInstruction("comp", condition, $reg.r));
+          
           b.successors.add(thenblock);
           if(elseLast == null){
              b.successors.add(continueblock);
+             b.instructions.add(new BranchInstruction("cbreq", thenblock.name, continueblock.name));
           }
           else{
              b.successors.add(elseblock);
              if(!$thenLast.rblock.name.equals("exit")){
                $elseLast.rblock.successors.add(continueblock);
+               b.instructions.add(new BranchInstruction("cbreq", thenblock.name, elseblock.name));
              }
           }
           continueblock.name = "L" + c + " (cont)";
           if(!$thenLast.rblock.name.equals("exit")){
             $thenLast.rblock.successors.add(continueblock);
           }
+          
        }
    ;
    
