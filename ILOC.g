@@ -60,7 +60,9 @@ declaration[HashMap<String, Register> regtable]
 id_list[HashMap<String, Register> regtable]
    : (rid=id
       {
-         $regtable.put($rid.rstring, new Register($rid.rstring));
+         Register temp = new Register($rid.rstring);
+         temp.global = true;
+         $regtable.put($rid.rstring, temp);
       }
    )+
    ;
