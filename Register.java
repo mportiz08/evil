@@ -21,6 +21,9 @@ public class Register extends Operand
   
   public String toString()
   {
+    if(global){
+      return "g" + name;
+    }
     return name;
   }
 }
