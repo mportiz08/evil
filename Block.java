@@ -32,6 +32,21 @@ public class Block
     }
   }
   
+  public void printInstructions()
+  {
+    System.out.println(name + ":");
+    for(Block b : successors)
+    {
+      if(!b.visited){
+        b.visited = true;
+        for(Instruction i : instructions)
+        {
+          System.out.println(i);
+        }
+      }
+    }
+  }
+  
   public String toString(){
     return name + ":" + subTreeString() + "\n";
     

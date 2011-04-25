@@ -15,7 +15,7 @@ public class Register extends Operand
   
   public Register(String name)
   {
-    name = "r" + name;
+    this.name = "r" + name;
     global = false;
   }
   

@@ -36,7 +36,9 @@ functions[HashMap<String, Register> regtable]
    :  ^(FUNCS{ArrayList<Block> blist = new ArrayList<Block>();} (rfun=function[regtable] {blist.add($rfun.rblock);})*)
        {
           for(Block b : blist){
-            b.printTree();
+            //b.printTree();
+            b.printInstructions();
+            System.out.println();
           }
        }
    ;
@@ -46,7 +48,9 @@ type_sub
    ;
 
 decl[HashMap<String, Register> regtable]
-   :  ^(DECL ^(TYPE type) id)
+   :  ^(DECL ^(TYPE type) rid=id
+         { $regtable.put($rid.rstring, new Register($rid.rstring)); }
+       )
    ;
 
 nested_decl
@@ -106,7 +110,9 @@ localdeclaration[HashMap<String, Register> regtable]
    ;
    
 localid_list[HashMap<String, Register> regtable]
-   : id+
+   : (rid=id
+      { $regtable.put($rid.rstring, new Register($rid.rstring)); }
+     )+
    ;
 
 params[HashMap<String, Register> regtable]
