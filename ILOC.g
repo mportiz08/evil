@@ -209,28 +209,28 @@ lvalue[HashMap<String, Register> regtable, Block b, Block exit]
    | ^(DOT lvalue[regtable, b, exit] id)
    ;
    
-expression[HashMap<String, Register> regtable, Block b, Block exit]
-   : ^(AND expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("and", new Register(), new Register(), new Register()));})
-   | ^(OR expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("or", new Register(), new Register(), new Register()));})
-   | ^(EQ expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("moveq", new Register(), new Register(), new Register()));})
-   | ^(LT expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movlt", new Register(), new Register(), new Register()));})
-   | ^(GT expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movgt", new Register(), new Register(), new Register()));})
-   | ^(NE expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movne", new Register(), new Register(), new Register()));})
-   | ^(LE expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movle", new Register(), new Register(), new Register()));})
-   | ^(GE expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movge", new Register(), new Register(), new Register()));})
-   | ^(PLUS expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("add", new Register(), new Register(), new Register()));})
-   | ^(MINUS expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("sub", new Register(), new Register(), new Register()));})
-   | ^(TIMES expression[regtable, b, exit] expression[regtable, b, exit]  {b.instructions.add(new ArithmeticInstruction("mult", new Register(), new Register(), new Register()));})
-   | ^(DIVIDE expression[regtable, b, exit] expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("div", new Register(), new Register(), new Register()));})
-   | ^(NOT expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("xori", new Register(), new Register(), new Register()));/*xori r1, true, dest*/})
-   | ^(NEG expression[regtable, b, exit]  {b.instructions.add(new ArithmeticInstruction("mult", new Register(), new Register(), new Register()));/*multi r1, -1, dest*/})
+expression[HashMap<String, Register> regtable, Block b, Block exit] returns [Register r = new Register()]
+   : ^(AND lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("and", $lv.r, $rv.r, r));})
+   | ^(OR lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("or", $lv.r, $rv.r, r));})
+   | ^(EQ lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("moveq", $lv.r, $rv.r, r));})
+   | ^(LT lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movlt", $lv.r, $rv.r, r));})
+   | ^(GT lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movgt", $lv.r, $rv.r, r));})
+   | ^(NE lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movne", $lv.r, $rv.r, r));})
+   | ^(LE lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movle", $lv.r, $rv.r, r));})
+   | ^(GE lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movge", $lv.r, $rv.r, r));})
+   | ^(PLUS lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("add", $lv.r, $rv.r, r));})
+   | ^(MINUS lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("sub", $lv.r, $rv.r, r));})
+   | ^(TIMES lv=expression[regtable, b, exit] rv=expression[regtable, b, exit]  {b.instructions.add(new ArithmeticInstruction("mult", $lv.r, $rv.r, r));})
+   | ^(DIVIDE lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("div", $lv.r, $rv.r, r));})
+   | ^(NOT uv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("xori", $uv.r, new Register(), r));/*xori r, true, dest*/})
+   | ^(NEG uv=expression[regtable, b, exit]  {b.instructions.add(new ArithmeticInstruction("mult", $uv.r, new Register(), r));/*multi r, -1, dest*/})
    | ^(DOT expression[regtable, b, exit] id)
-   |  id 
-   |  INTEGER
-   |  TRUE
-   |  FALSE
-   |  ^(NEW id)
-   |  NULL
+   |  rid=id {r = regtable.get($rid.rstring);}
+   |  tnode=INTEGER{b.instructions.add(new LoadInstruction("loadi", $tnode.text, r));}
+   |  TRUE{b.instructions.add(new LoadInstruction("loadi", "true", r));}
+   |  FALSE{b.instructions.add(new LoadInstruction("loadi", "false", r));}
+   |  ^(NEW id){/*?*/}
+   |  NULL{/*?*/}
    |  ^(INVOKE id arguments[regtable, b, exit])
    ;
    
