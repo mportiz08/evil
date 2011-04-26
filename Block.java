@@ -32,20 +32,22 @@ public class Block
     }
   }
   
-  public void printInstructions()
+  public String getInstructions()
   {
-    System.out.println(name + ":");
+    String rstring = "";
+    rstring += name + ":" + "\n";
     for(Instruction i : instructions)
     {
-      System.out.println("  " + i);
+      rstring += "  " + i + "\n";
     }
     for(Block b : successors)
     {
       if(!b.visited){
         b.visited = true;
-        b.printInstructions();
+        rstring += b.getInstructions();
       }
     }
+    return rstring;
   }
   
   public String toString(){

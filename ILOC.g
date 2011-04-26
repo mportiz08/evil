@@ -16,12 +16,12 @@ options
    import java.util.ArrayList;
 }
 
-generate
+generate[ArrayList<Block> blist]
    @init
    {
       HashMap<String, Register> regtable = new HashMap<String, Register>();
    }
-   :  ^(PROGRAM types declarations[regtable] functions[regtable])
+   :  ^(PROGRAM types declarations[regtable] functions[regtable,blist])
    ;
 
 types
@@ -32,15 +32,8 @@ declarations[HashMap<String, Register> regtable]
    :  ^(DECLS (declaration[regtable])*)
    ;
 
-functions[HashMap<String, Register> regtable]
-   :  ^(FUNCS{ArrayList<Block> blist = new ArrayList<Block>();} (rfun=function[regtable] {blist.add($rfun.rblock);})*)
-       {
-          for(Block b : blist){
-            //b.printTree();
-            b.printInstructions();
-            System.out.println();
-          }
-       }
+functions[HashMap<String, Register> regtable,ArrayList<Block> blist]
+   :  ^(FUNCS (rfun=function[regtable] {blist.add($rfun.rblock);})*)
    ;
 
 type_sub

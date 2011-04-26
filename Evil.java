@@ -3,8 +3,7 @@ import org.antlr.runtime.tree.*;
 import org.antlr.stringtemplate.*;
 
 import java.io.*;
-import java.util.Vector;
-import java.util.HashMap;
+import java.util.*;
 
 public class Evil
 {
@@ -49,8 +48,18 @@ public class Evil
          nodes.setTokenStream(tokens);
 
          ILOC iloc = new ILOC(nodes);
+         ArrayList<Block> blist = new ArrayList<Block>();
+         iloc.generate(blist);
          
-         iloc.generate();
+        
+         String ilocstr = "";
+         for(Block b : blist){
+           //b.printTree();
+           ilocstr += b.getInstructions() + "\n";
+         }
+         if(!_dumpIL){
+           System.out.println(ilocstr);
+         }
       }
       catch (org.antlr.runtime.RecognitionException e)
       {
@@ -59,9 +68,11 @@ public class Evil
    }
 
    private static final String DISPLAYAST = "-displayAST";
+   private static final String DUMPIL = "-dumpIL";
 
    private static String _inputFile = null;
    private static boolean _displayAST = false;
+   private static boolean _dumpIL = false;
 
    private static void parseParameters(String [] args)
    {
@@ -70,6 +81,10 @@ public class Evil
          if (args[i].equals(DISPLAYAST))
          {
             _displayAST = true;
+         }
+         else if(args[i].equals(DUMPIL))
+         {
+            _dumpIL = true;
          }
          else if (args[i].charAt(0) == '-')
          {
