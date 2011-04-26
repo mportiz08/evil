@@ -190,12 +190,14 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit] returns [Bl
              b.successors.add(elseblock);
              if(!$thenLast.rblock.name.equals("exit")){
                $elseLast.rblock.successors.add(continueblock);
+               $elseLast.rblock.instructions.add(new JumpInstruction(continueblock.name));
                b.instructions.add(new BranchInstruction("cbreq", thenblock.name, elseblock.name));
              }
           }
           continueblock.name = "L" + c + " (cont)";
           if(!$thenLast.rblock.name.equals("exit")){
             $thenLast.rblock.successors.add(continueblock);
+            $thenLast.rblock.instructions.add(new JumpInstruction(continueblock.name));
           }
           
        }
