@@ -37,7 +37,7 @@ public class Block
     System.out.println(name + ":");
     for(Instruction i : instructions)
     {
-      System.out.println(i);
+      System.out.println("  " + i);
     }
     for(Block b : successors)
     {

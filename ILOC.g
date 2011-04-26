@@ -239,12 +239,72 @@ lvalue[HashMap<String, Register> regtable, Block b, Block exit]
 expression[HashMap<String, Register> regtable, Block b, Block exit] returns [Register r = new Register()]
    : ^(AND lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("and", $lv.r, $rv.r, r));})
    | ^(OR lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("or", $lv.r, $rv.r, r));})
-   | ^(EQ lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("moveq", $lv.r, $rv.r, r));})
-   | ^(LT lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movlt", $lv.r, $rv.r, r));})
-   | ^(GT lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movgt", $lv.r, $rv.r, r));})
-   | ^(NE lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movne", $lv.r, $rv.r, r));})
-   | ^(LE lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movle", $lv.r, $rv.r, r));})
-   | ^(GE lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("movge", $lv.r, $rv.r, r));})
+   | ^(EQ lv=expression[regtable, b, exit] rv=expression[regtable, b, exit]
+        {
+          Register lr = new Register();
+          Register rr = new Register();
+          b.instructions.add(new MoveInstruction($lv.r, lr));
+          b.instructions.add(new MoveInstruction($rv.r, rr));
+          b.instructions.add(new LoadInstruction("loadi", "0", r));
+          b.instructions.add(new ComparisonInstruction("comp", lr, rr));
+          b.instructions.add(new MoveConditionInstruction("moveq", "1", r));
+        }
+      )
+   | ^(LT lv=expression[regtable, b, exit] rv=expression[regtable, b, exit]
+        {
+          Register lr = new Register();
+          Register rr = new Register();
+          b.instructions.add(new MoveInstruction($lv.r, lr));
+          b.instructions.add(new MoveInstruction($rv.r, rr));
+          b.instructions.add(new LoadInstruction("loadi", "0", r));
+          b.instructions.add(new ComparisonInstruction("comp", lr, rr));
+          b.instructions.add(new MoveConditionInstruction("movlt", "1", r));
+        }
+      )
+   | ^(GT lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] 
+        {
+          Register lr = new Register();
+          Register rr = new Register();
+          b.instructions.add(new MoveInstruction($lv.r, lr));
+          b.instructions.add(new MoveInstruction($rv.r, rr));
+          b.instructions.add(new LoadInstruction("loadi", "0", r));
+          b.instructions.add(new ComparisonInstruction("comp", lr, rr));
+          b.instructions.add(new MoveConditionInstruction("movgt", "1", r));
+        }
+      )
+   | ^(NE lv=expression[regtable, b, exit] rv=expression[regtable, b, exit]
+        {
+          Register lr = new Register();
+          Register rr = new Register();
+          b.instructions.add(new MoveInstruction($lv.r, lr));
+          b.instructions.add(new MoveInstruction($rv.r, rr));
+          b.instructions.add(new LoadInstruction("loadi", "0", r));
+          b.instructions.add(new ComparisonInstruction("comp", lr, rr));
+          b.instructions.add(new MoveConditionInstruction("movne", "1", r));
+        }
+      )
+   | ^(LE lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] 
+        {
+          Register lr = new Register();
+          Register rr = new Register();
+          b.instructions.add(new MoveInstruction($lv.r, lr));
+          b.instructions.add(new MoveInstruction($rv.r, rr));
+          b.instructions.add(new LoadInstruction("loadi", "0", r));
+          b.instructions.add(new ComparisonInstruction("comp", lr, rr));
+          b.instructions.add(new MoveConditionInstruction("movle", "1", r));
+        }
+      )
+   | ^(GE lv=expression[regtable, b, exit] rv=expression[regtable, b, exit]
+        {
+          Register lr = new Register();
+          Register rr = new Register();
+          b.instructions.add(new MoveInstruction($lv.r, lr));
+          b.instructions.add(new MoveInstruction($rv.r, rr));
+          b.instructions.add(new LoadInstruction("loadi", "0", r));
+          b.instructions.add(new ComparisonInstruction("comp", lr, rr));
+          b.instructions.add(new MoveConditionInstruction("movge", "1", r));
+        }
+      )
    | ^(PLUS lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("add", $lv.r, $rv.r, r));})
    | ^(MINUS lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("sub", $lv.r, $rv.r, r));})
    | ^(TIMES lv=expression[regtable, b, exit] rv=expression[regtable, b, exit]  {b.instructions.add(new ArithmeticInstruction("mult", $lv.r, $rv.r, r));})
