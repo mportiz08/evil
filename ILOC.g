@@ -138,7 +138,15 @@ block[HashMap<String, Register> regtable, Block b, Block exit] returns [Block rb
    ;
    
 assignment[HashMap<String, Register> regtable, Block b, Block exit]
-   :  ^(ASSIGN expression[regtable, b, exit] lvalue[regtable, b, exit])
+   :  ^(ASSIGN rv=expression[regtable, b, exit] lv=lvalue[regtable, b, exit])
+        {
+           if(lv.offset == null){
+             b.instructions.add(new MoveInstruction($rv.r, $lv.r));
+           }
+           else{
+             b.instructions.add(new AddressInstruction("storeai", $rv.r, $lv.r, $lv.offset));
+           }
+        }
    ;
    
 print[HashMap<String, Register> regtable, Block b, Block exit]
@@ -168,12 +176,12 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit] returns [Bl
       Block thenblock = new Block();
       Block elseblock = new Block();
    }
-   :  ^(IF reg=expression[regtable, b, exit]{thenblock.name = "L" + c + " (if-then)";} thenLast = block[regtable, thenblock, exit] {elseblock.name = "L" + c + " (if-else)";}(elseLast = block[regtable, elseblock, exit])?)
+   :  ^(IF reg=expression[regtable, b, exit]{thenblock.name = "L" + c + "_(if-then)";} thenLast = block[regtable, thenblock, exit] {elseblock.name = "L" + c + "_(if-else)";}(elseLast = block[regtable, elseblock, exit])?)
        {
           Register condition = new Register();
           b.instructions.add(new LoadInstruction("loadi", "1", condition));
           b.instructions.add(new ComparisonInstruction("comp", condition, $reg.r));
-          continueblock.name = "L" + c + " (cont)";
+          continueblock.name = "L" + c + "_(cont)";
           b.successors.add(thenblock);
           if(elseLast == null){
              b.successors.add(continueblock);
@@ -202,10 +210,10 @@ loop[HashMap<String, Register> regtable, Block b, Block exit] returns [Block con
       Block.counter++;
       int c = Block.counter;
       Block expblock = new Block();
-      expblock.name = "L" + c + " (while-exp)";
+      expblock.name = "L" + c + "_(while-exp)";
       Block execblock = new Block();
-      execblock.name = "L" + c + " (while-exec)";
-      continueblock.name = "L" + c + " (while-cont)";
+      execblock.name = "L" + c + "_(while-exec)";
+      continueblock.name = "L" + c + "_(while-cont)";
    }
    :  ^(WHILE exp=expression[regtable, expblock, exit] lastexec=block[regtable, execblock, exit] expression[regtable, new Block(), exit])
        {
@@ -233,11 +241,24 @@ ret[HashMap<String, Register> regtable, Block b, Block exit] returns [Block rblo
    : ^(RETURN (expression[regtable, b, exit])?){b.successors.add(exit); b.instructions.add(new JumpInstruction(exit.name));$rblock = exit;}
    ;
    
-lvalue[HashMap<String, Register> regtable, Block b, Block exit]
-   :  id
-   | ^(DOT lvalue[regtable, b, exit] id)
+lvalue[HashMap<String, Register> regtable, Block b, Block exit] returns [Register r, String offset = null]
+   :  rid=id{$r = $regtable.get($rid.rstring);}
+   | ^(DOT lv=lvalue_h[regtable, b, new Register()] rid=id)
+      {
+        $r = $lv.r;
+        $offset = "@" + $rid.rstring;
+      }
    ;
-   
+
+lvalue_h[HashMap<String, Register> regtable, Block b, Register in] returns [Register r, String offset = null]
+   :  rid=id{$r = in; $offset = $rid.rstring;}
+   | ^(DOT lv=lvalue_h[regtable, b, in] rid=id)
+      {
+        $r = $lv.r;
+        $offset = "@" + $rid.rstring;
+      }
+   ;
+
 expression[HashMap<String, Register> regtable, Block b, Block exit] returns [Register r = new Register()]
    : ^(AND lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("and", $lv.r, $rv.r, r));})
    | ^(OR lv=expression[regtable, b, exit] rv=expression[regtable, b, exit] {b.instructions.add(new ArithmeticInstruction("or", $lv.r, $rv.r, r));})
