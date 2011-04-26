@@ -15,7 +15,7 @@ public class Block
   public Block()
   {
     visited = false;
-    name = "exit";
+    //name = "exit";
     instructions = new ArrayList<Instruction>();
     successors = new ArrayList<Block>();
     predecessors = new ArrayList<Block>();

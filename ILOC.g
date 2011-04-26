@@ -87,7 +87,7 @@ function[HashMap<String, Register> regtable] returns [Block rblock = new Block()
      HashMap<String, Register> regtable_copy = new HashMap<String, Register>(regtable);
      Block exit = new Block();
    }
-   :  ^(FUN rid=ID{$rblock.name=$rid.text;} params[regtable_copy] ^(RETTYPE isVoid=return_type) localdeclarations[regtable_copy] finalblk=statement_list[regtable_copy, rblock, exit]
+   :  ^(FUN rid=ID{$rblock.name=$rid.text;exit.name = "exit-" + $rblock.name;} params[regtable_copy] ^(RETTYPE isVoid=return_type) localdeclarations[regtable_copy] finalblk=statement_list[regtable_copy, rblock, exit]
          { 
            if($finalblk.rblock != null && $isVoid.isVoid)
            {
@@ -180,7 +180,7 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit] returns [Bl
           Register condition = new Register();
           b.instructions.add(new LoadInstruction("loadi", "true", condition));
           b.instructions.add(new ComparisonInstruction("comp", condition, $reg.r));
-          
+          continueblock.name = "L" + c + " (cont)";
           b.successors.add(thenblock);
           if(elseLast == null){
              b.successors.add(continueblock);
@@ -194,7 +194,7 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit] returns [Bl
                b.instructions.add(new BranchInstruction("cbreq", thenblock.name, elseblock.name));
              }
           }
-          continueblock.name = "L" + c + " (cont)";
+          
           if(!$thenLast.rblock.name.equals("exit")){
             $thenLast.rblock.successors.add(continueblock);
             $thenLast.rblock.instructions.add(new JumpInstruction(continueblock.name));
@@ -228,7 +228,7 @@ delete[HashMap<String, Register> regtable, Block b, Block exit]
    ;
    
 ret[HashMap<String, Register> regtable, Block b, Block exit] returns [Block rblock]
-   : ^(RETURN (expression[regtable, b, exit])?){b.successors.add(exit); $rblock = exit;}
+   : ^(RETURN (expression[regtable, b, exit])?){b.successors.add(exit); b.instructions.add(new JumpInstruction(exit.name));$rblock = exit;}
    ;
    
 lvalue[HashMap<String, Register> regtable, Block b, Block exit]
