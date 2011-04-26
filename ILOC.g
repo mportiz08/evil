@@ -178,7 +178,7 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit] returns [Bl
    :  ^(IF reg=expression[regtable, b, exit]{thenblock.name = "L" + c + " (if-then)";} thenLast = block[regtable, thenblock, exit] {elseblock.name = "L" + c + " (if-else)";}(elseLast = block[regtable, elseblock, exit])?)
        {
           Register condition = new Register();
-          b.instructions.add(new LoadInstruction("loadi", "true", condition));
+          b.instructions.add(new LoadInstruction("loadi", "1", condition));
           b.instructions.add(new ComparisonInstruction("comp", condition, $reg.r));
           continueblock.name = "L" + c + " (cont)";
           b.successors.add(thenblock);
@@ -254,8 +254,8 @@ expression[HashMap<String, Register> regtable, Block b, Block exit] returns [Reg
    | ^(DOT expression[regtable, b, exit] id)
    |  rid=id {r = regtable.get($rid.rstring);}
    |  tnode=INTEGER{b.instructions.add(new LoadInstruction("loadi", $tnode.text, r));}
-   |  TRUE{b.instructions.add(new LoadInstruction("loadi", "true", r));}
-   |  FALSE{b.instructions.add(new LoadInstruction("loadi", "false", r));}
+   |  TRUE{b.instructions.add(new LoadInstruction("loadi", "1", r));}
+   |  FALSE{b.instructions.add(new LoadInstruction("loadi", "0", r));}
    |  ^(NEW id){/*?*/}
    |  NULL{/*?*/}
    |  ^(INVOKE id arguments[regtable, b, exit])
