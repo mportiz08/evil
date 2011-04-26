@@ -13,3 +13,4 @@ output/
 ILOC.java
 ILOC.tokens
 antlr-3.3-complete.jar
+*.il

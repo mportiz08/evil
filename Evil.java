@@ -60,6 +60,16 @@ public class Evil
          if(!_dumpIL){
            System.out.println(ilocstr);
          }
+         else{
+           try{
+             FileOutputStream f = new FileOutputStream(_inputFile.replace(".ev", "") + ".il");
+             f.write(ilocstr.getBytes());
+             f.close();
+           }
+           catch(IOException e){
+             e.printStackTrace();
+           }
+         }
       }
       catch (org.antlr.runtime.RecognitionException e)
       {
