@@ -1,8 +1,8 @@
-public class IOInstruction extends Instruction
+public class UnaryInstruction extends Instruction
 {
   public Register reg;
   
-  public IOInstruction(String name, Register reg)
+  public UnaryInstruction(String name, Register reg)
   {
     super(name);
     this.reg = reg;

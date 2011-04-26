@@ -149,13 +149,13 @@ assignment[HashMap<String, Register> regtable, Block b, Block exit]
    ;
    
 print[HashMap<String, Register> regtable, Block b, Block exit]
-   :  ^(PRINT expression[regtable, b, exit] (println = ENDL)?)
+   :  ^(PRINT reg=expression[regtable, b, exit] (println = ENDL)?)
       {
         if(println == null){
-          b.instructions.add(new IOInstruction("print", new Register()));
+          b.instructions.add(new UnaryInstruction("print", $reg.r));
         }
         else{
-          b.instructions.add(new IOInstruction("println", new Register()));
+          b.instructions.add(new UnaryInstruction("println", $reg.r));
         }
       }
    ;
@@ -163,7 +163,7 @@ print[HashMap<String, Register> regtable, Block b, Block exit]
 read[HashMap<String, Register> regtable, Block b, Block exit]
    :  ^(READ lvalue[regtable, b, exit])
       {
-        b.instructions.add(new IOInstruction("read", new Register()));
+        b.instructions.add(new UnaryInstruction("read", new Register()));
       }
    ;
    
@@ -229,7 +229,11 @@ loop[HashMap<String, Register> regtable, Block b, Block exit] returns [Block con
    ;
  
 delete[HashMap<String, Register> regtable, Block b, Block exit]
-   :  ^(DELETE expression[regtable, b, exit])
+   :  ^(DELETE reg=expression[regtable, b, exit]
+         {
+           b.instructions.add(new UnaryInstruction("del", $reg.r));
+         }
+       )
    ;
    
 ret[HashMap<String, Register> regtable, Block b, Block exit] returns [Block rblock]
