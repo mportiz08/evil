@@ -214,12 +214,17 @@ loop[HashMap<String, Register> regtable, Block b, Block exit] returns [Block con
       execblock.name = "L" + c + " (while-exec)";
       continueblock.name = "L" + c + " (while-cont)";
    }
-   :  ^(WHILE expression[regtable, expblock, exit] lastexec=block[regtable, execblock, exit] expression[regtable, new Block(), exit])
+   :  ^(WHILE exp=expression[regtable, expblock, exit] lastexec=block[regtable, execblock, exit] expression[regtable, new Block(), exit])
        {
+         Register condition = new Register();
+         expblock.instructions.add(new LoadInstruction("loadi", "1", condition));
+         expblock.instructions.add(new ComparisonInstruction("comp", condition, $exp.r));
+         expblock.instructions.add(new BranchInstruction("cbreq", execblock.name, continueblock.name));
          b.successors.add(expblock);
          expblock.successors.add(execblock);
          expblock.successors.add(continueblock);
          $lastexec.rblock.successors.add(expblock);
+         $lastexec.rblock.instructions.add(new JumpInstruction(expblock.name));
        }
    ;
  
