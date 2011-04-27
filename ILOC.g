@@ -253,21 +253,20 @@ ret[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, Str
      }
    ;
    
-lvalue[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, StructType> structtable] returns [Register r, String offset = null]
+lvalue[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, StructType> structtable] returns [Register r = new Register(), String offset = null]
    :  rid=id{$r = $regtable.get($rid.rstring);}
-   | ^(DOT lv=lvalue_h[regtable, b, new Register(), structtable] rid=id)
+   | ^(DOT lv=lvalue_h[regtable, b, $r, structtable] rid=id)
       {
         $r = $lv.r;
         $offset = "@" + $rid.rstring;
       }
    ;
 
-lvalue_h[HashMap<String, Register> regtable, Block b, Register in, HashMap<String, StructType> structtable] returns [Register r, String offset = null]
-   :  rid=id{$r = in; $offset = $rid.rstring;}
+lvalue_h[HashMap<String, Register> regtable, Block b, Register in, HashMap<String, StructType> structtable] returns [Register r = new Register()]
+   :  rid=id{$r = regtable.get($rid.rstring);}
    | ^(DOT lv=lvalue_h[regtable, b, in, structtable] rid=id)
       {
-        $r = $lv.r;
-        $offset = "@" + $rid.rstring;
+        b.instructions.add(new AddressInstruction("loadai", $lv.r, $r, "@" + $rid.rstring));
       }
    ;
 
