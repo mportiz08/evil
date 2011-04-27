@@ -54,8 +54,14 @@ public class Evil
         
          String ilocstr = "";
          for(Block b : blist){
-           //b.printTree();
-           ilocstr += b.getInstructions() + "\n";
+           if(b.name.equals("main")){
+             ilocstr += b.getInstructions() + "\n";
+           }
+         }
+         for(Block b : blist){
+           if(!b.name.equals("main")){
+             ilocstr += b.getInstructions() + "\n";
+           }
          }
          if(!_dumpIL){
            System.out.println(ilocstr);

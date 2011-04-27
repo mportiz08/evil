@@ -163,9 +163,9 @@ print[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, S
    ;
    
 read[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, StructType> structtable]
-   :  ^(READ lvalue[regtable, b, exit, structtable])
+   :  ^(READ reg=lvalue[regtable, b, exit, structtable])
       {
-        b.instructions.add(new UnaryInstruction("read", new Register()));
+        b.instructions.add(new UnaryInstruction("read", $reg.r));
       }
    ;
    
@@ -190,7 +190,7 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Str
           }
           else{
              b.successors.add(elseblock);
-             if(!$thenLast.rblock.name.equals("exit")){
+             if(!$thenLast.rblock.name.substring(0, 4).equals("exit")){
                $elseLast.rblock.successors.add(continueblock);
                $elseLast.rblock.instructions.add(new JumpInstruction(continueblock.name));
                b.instructions.add(new BranchInstruction("cbreq", thenblock.name, elseblock.name));
@@ -239,7 +239,18 @@ delete[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, 
    ;
    
 ret[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, StructType> structtable] returns [Block rblock]
-   : ^(RETURN (expression[regtable, b, exit, structtable])?){b.successors.add(exit); b.instructions.add(new JumpInstruction(exit.name));$rblock = exit;}
+   : ^(RETURN (reg=expression[regtable, b, exit, structtable])?)
+      {
+        b.successors.add(exit);
+        if(reg==null){
+          b.instructions.add(new RetInstruction());
+        }
+        else{
+          b.instructions.add(new RetInstruction($reg.r));
+        }
+        b.instructions.add(new JumpInstruction(exit.name));
+        $rblock = exit;
+     }
    ;
    
 lvalue[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, StructType> structtable] returns [Register r, String offset = null]
