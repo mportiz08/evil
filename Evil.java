@@ -41,15 +41,15 @@ public class Evil
          CommonTreeNodeStream nodes = new CommonTreeNodeStream(t);
          nodes.setTokenStream(tokens);
          TypeCheck tparser = new TypeCheck(nodes);
-
-         tparser.verify(new HashMap<String, FuncType>(), new HashMap<String, StructType>(), new HashMap<String, Type>());
+         HashMap<String, StructType> structtable = new HashMap<String, StructType>();
+         tparser.verify(new HashMap<String, FuncType>(), structtable, new HashMap<String, Type>());
          
-	 nodes = new CommonTreeNodeStream(t);
+         nodes = new CommonTreeNodeStream(t);
          nodes.setTokenStream(tokens);
 
          ILOC iloc = new ILOC(nodes);
          ArrayList<Block> blist = new ArrayList<Block>();
-         iloc.generate(blist);
+         iloc.generate(blist,structtable);
          
         
          String ilocstr = "";
