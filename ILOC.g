@@ -346,7 +346,10 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
          b.instructions.add(new NewInstruction($rid.rstring, temp, r));
        }
    |  NULL{/*?*/}
-   |  ^(INVOKE id arguments[regtable, b, exit, structtable])
+   |  ^(INVOKE rid=id arguments[regtable, b, exit, structtable])
+      {
+        b.instructions.add(new CallInstruction($rid.rstring, r));
+      }
    ;
    
 arguments[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, StructType> structtable]
@@ -354,6 +357,15 @@ arguments[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Strin
    ;
    
 arg_list[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, StructType> structtable]
+   @init
+   {
+      ArrayList<Register> reglist = new ArrayList<Register>();
+   }
    :  ARGS
-   |  ^(ARGS expression[regtable, b, exit, structtable]+)
+   |  ^(ARGS (reg = expression[regtable, b, exit, structtable]{reglist.add($reg.r);})+)
+      {
+         for(int i = 0; i < reglist.size(); i++){
+           b.instructions.add(new StoreOutInstruction(new Integer(i).toString(),reglist.get(i)));
+         }
+      }
    ;
