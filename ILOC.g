@@ -346,7 +346,11 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
    | ^(DIVIDE lv=expression[regtable, b, exit, structtable] rv=expression[regtable, b, exit, structtable] {b.instructions.add(new ArithmeticInstruction("div", $lv.r, $rv.r, r));})
    | ^(NOT uv=expression[regtable, b, exit, structtable] {b.instructions.add(new ArithmeticInstruction("xori", $uv.r, new Register(), r));/*xori r, true, dest*/})
    | ^(NEG uv=expression[regtable, b, exit, structtable]  {b.instructions.add(new ArithmeticInstruction("mult", $uv.r, new Register(), r));/*multi r, -1, dest*/})
-   | ^(DOT expression[regtable, b, exit, structtable] id)
+   | ^(DOT reg=expression[regtable, b, exit, structtable] rid=id
+        {
+          b.instructions.add(new AddressInstruction("loadai", $reg.r, r, "@" + $rid.rstring));
+        }
+      )
    |  rid=id {r = regtable.get($rid.rstring);}
    |  tnode=INTEGER{b.instructions.add(new LoadInstruction("loadi", $tnode.text, r));}
    |  TRUE{b.instructions.add(new LoadInstruction("loadi", "1", r));}
