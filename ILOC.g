@@ -165,7 +165,14 @@ print[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, S
 read[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, StructType> structtable]
    :  ^(READ reg=lvalue[regtable, b, exit, structtable])
       {
-        b.instructions.add(new UnaryInstruction("read", $reg.r));
+        Register temp = new Register();
+        b.instructions.add(new UnaryInstruction("read", temp));
+        if(reg.offset == null){
+          b.instructions.add(new MoveInstruction(temp, $reg.r));
+        }
+        else{
+          b.instructions.add(new AddressInstruction("storeai", temp, $reg.r, $reg.offset));
+        }
       }
    ;
    
