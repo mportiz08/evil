@@ -14,6 +14,12 @@ public class AddressInstruction extends Instruction
   
   public String toString()
   {
-    return new String(name + " " + src + ", " + dest + ", " + offset);
+    if(name.equals("storeai")) {
+      return new String(name + " " + src + ", " + dest + ", " + offset);
+    } else if(name.equals("loadai")) {
+      return new String(name + " " + src + ", " + offset + ", " + dest);
+    } else {
+      return new String(name + " " + src + ", " + dest + ", " + offset);
+    }
   }
 }
