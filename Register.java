@@ -9,21 +9,18 @@ public class Register extends Operand
   {
     counter++;
     num = counter;
-    name = "r" + num;
+    name = new Integer(num).toString();
     global = false;
   }
   
   public Register(String name)
   {
-    this.name = "r" + name;
+    this.name = name;
     global = false;
   }
   
   public String toString()
   {
-    if(global){
-      return "g" + name;
-    }
-    return name;
+    return "r" + name;
   }
 }

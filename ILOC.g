@@ -357,7 +357,15 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
           b.instructions.add(new AddressInstruction("loadai", $reg.r, r, "@" + $rid.rstring));
         }
       )
-   |  rid=id {r = regtable.get($rid.rstring);}
+   |  rid=id
+   {
+     Register temp = regtable.get($rid.rstring);
+     if(temp.global) {
+       b.instructions.add(new LoadGlobalInstruction(temp.name, r));
+     } else {
+       r = temp;
+     }
+   }
    |  tnode=INTEGER{b.instructions.add(new LoadInstruction("loadi", $tnode.text, r));}
    |  TRUE{b.instructions.add(new LoadInstruction("loadi", "1", r));}
    |  FALSE{b.instructions.add(new LoadInstruction("loadi", "0", r));}
