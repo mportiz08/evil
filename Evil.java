@@ -48,17 +48,32 @@ public class Evil
          nodes.setTokenStream(tokens);
 
          ILOC iloc = new ILOC(nodes);
-         ArrayList<Block> blist = new ArrayList<Block>();
+         ArrayList<FuncBlock> blist = new ArrayList<FuncBlock>();
          iloc.generate(blist,structtable);
          
         
          String ilocstr = "";
-         for(Block b : blist){
+         
+         for(FuncBlock b : blist){
+           if(b.name.equals("main")){
+             ilocstr += "@function " + b.name + "\n";
+           }
+         }
+         for(FuncBlock b : blist){
+           if(!b.name.equals("main")){
+             ilocstr += "@function " + b.name + "\n";
+           }
+         }
+         for(FuncBlock b : blist){
+           ilocstr += b.getHeader() + "\n";
+         }
+           
+         for(FuncBlock b : blist){
            if(b.name.equals("main")){
              ilocstr += b.getInstructions() + "\n";
            }
          }
-         for(Block b : blist){
+         for(FuncBlock b : blist){
            if(!b.name.equals("main")){
              ilocstr += b.getInstructions() + "\n";
            }

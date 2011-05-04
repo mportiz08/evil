@@ -9,7 +9,7 @@ public class Register extends Operand
   {
     counter++;
     num = counter;
-    name = new Integer(num).toString();
+    name = "r" + new Integer(num).toString();
     global = false;
   }
   
@@ -21,6 +21,6 @@ public class Register extends Operand
   
   public String toString()
   {
-    return "r" + name;
+    return name;
   }
 }

@@ -17,7 +17,7 @@ options
    import java.util.HashSet;
 }
 
-generate[ArrayList<Block> blist, HashMap<String, StructType> structtable]
+generate[ArrayList<FuncBlock> blist, HashMap<String, StructType> structtable]
    @init
    {
       HashMap<String, Register> regtable = new HashMap<String, Register>();
@@ -33,7 +33,7 @@ declarations[HashMap<String, Register> regtable]
    :  ^(DECLS (declaration[regtable])*)
    ;
 
-functions[HashMap<String, Register> regtable,ArrayList<Block> blist,HashMap<String, StructType> structtable]
+functions[HashMap<String, Register> regtable,ArrayList<FuncBlock> blist,HashMap<String, StructType> structtable]
    :  ^(FUNCS (rfun=function[regtable,structtable] {blist.add($rfun.rblock);})*)
    ;
 
@@ -41,9 +41,12 @@ type_sub
    :  ^(STRUCT id nested_decl)
    ;
 
-decl[HashMap<String, Register> regtable]
+decl[HashMap<String, Register> regtable] returns [String rstring = new String()]
    :  ^(DECL ^(TYPE type) rid=id
-         { $regtable.put($rid.rstring, new Register($rid.rstring)); }
+         { 
+           $regtable.put($rid.rstring, new Register($rid.rstring));
+           $rstring = $rid.rstring;
+         }
        )
    ;
 
@@ -75,13 +78,13 @@ id returns [String rstring = null]
    : ^(tnode=ID {$rstring = $tnode.text;})
    ;
 
-function[HashMap<String, Register> regtable, HashMap<String, StructType> structtable] returns [Block rblock = new Block()]
+function[HashMap<String, Register> regtable, HashMap<String, StructType> structtable] returns [FuncBlock rblock = new FuncBlock()]
    @init
    {
      HashMap<String, Register> regtable_copy = new HashMap<String, Register>(regtable);
      Block exit = new Block();
    }
-   :  ^(FUN rid=ID{$rblock.name=$rid.text;exit.name = "exit-" + $rblock.name;} params[regtable_copy] ^(RETTYPE isVoid=return_type) localdeclarations[regtable_copy] finalblk=statement_list[regtable_copy, rblock, exit,structtable]
+   :  ^(FUN rid=ID{$rblock.name=$rid.text;exit.name = "exit" + $rblock.name;} params[regtable_copy, rblock] ^(RETTYPE isVoid=return_type) localdeclarations[regtable_copy, rblock] finalblk=statement_list[regtable_copy, rblock, exit,structtable]
          { 
            if($finalblk.rblock != null && $isVoid.isVoid)
            {
@@ -95,22 +98,25 @@ function[HashMap<String, Register> regtable, HashMap<String, StructType> structt
        )
    ;
 
-localdeclarations[HashMap<String, Register> regtable_copy]
-   :  ^(DECLS (localdeclaration[regtable_copy])*)
+localdeclarations[HashMap<String, Register> regtable_copy, FuncBlock rblock]
+   :  ^(DECLS (localdeclaration[regtable_copy, rblock])*)
    ;
 
-localdeclaration[HashMap<String, Register> regtable]
-   :  ^(DECLLIST ^(TYPE type) localid_list[regtable])
+localdeclaration[HashMap<String, Register> regtable, FuncBlock rblock]
+   :  ^(DECLLIST ^(TYPE type) localid_list[regtable, rblock])
    ;
    
-localid_list[HashMap<String, Register> regtable]
+localid_list[HashMap<String, Register> regtable, FuncBlock rblock]
    : (rid=id
-      { $regtable.put($rid.rstring, new Register($rid.rstring)); }
+      { 
+        $regtable.put($rid.rstring, new Register($rid.rstring));
+        $rblock.locals.add($rid.rstring);
+      }
      )+
    ;
 
-params[HashMap<String, Register> regtable]
-   :  ^(PARAMS (decl[regtable])*)
+params[HashMap<String, Register> regtable, FuncBlock rblock]
+   :  ^(PARAMS (rdecl = decl[regtable]{rblock.locals.add($rdecl.rstring);})*)
    ;
 
 return_type returns [boolean isVoid = false]
@@ -142,7 +148,8 @@ assignment[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
    :  ^(ASSIGN rv=expression[regtable, b, exit, structtable] lv=lvalue[regtable, b, exit, structtable])
         {
            if(lv.offset == null){
-             b.instructions.add(new MoveInstruction($rv.r, $lv.r));
+             b.instructions.add(new StoreVariableInstruction($lv.r.name, $rv.r)); 
+             //b.instructions.add(new MoveInstruction($rv.r, $lv.r));
            }
            else{
              b.instructions.add(new AddressInstruction("storeai", $rv.r, $lv.r, $lv.offset));
@@ -184,12 +191,12 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Str
       Block thenblock = new Block();
       Block elseblock = new Block();
    }
-   :  ^(IF reg=expression[regtable, b, exit, structtable]{thenblock.name = "L" + c + "_(if-then)";} thenLast = block[regtable, thenblock, exit, structtable] {elseblock.name = "L" + c + "_(if-else)";}(elseLast = block[regtable, elseblock, exit, structtable])?)
+   :  ^(IF reg=expression[regtable, b, exit, structtable]{thenblock.name = "L" + c + "ifthen";} thenLast = block[regtable, thenblock, exit, structtable] {elseblock.name = "L" + c + "ifelse";}(elseLast = block[regtable, elseblock, exit, structtable])?)
        {
           Register condition = new Register();
           b.instructions.add(new LoadInstruction("loadi", "1", condition));
           b.instructions.add(new ComparisonInstruction("comp", condition, $reg.r));
-          continueblock.name = "L" + c + "_(cont)";
+          continueblock.name = "L" + c + "cont";
           b.successors.add(thenblock);
           if(elseLast == null){
              b.successors.add(continueblock);
@@ -218,10 +225,10 @@ loop[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, St
       Block.counter++;
       int c = Block.counter;
       Block expblock = new Block();
-      expblock.name = "L" + c + "_(while-exp)";
+      expblock.name = "L" + c + "whileexp";
       Block execblock = new Block();
-      execblock.name = "L" + c + "_(while-exec)";
-      continueblock.name = "L" + c + "_(while-cont)";
+      execblock.name = "L" + c + "whileexec";
+      continueblock.name = "L" + c + "whilecont";
    }
    :  ^(WHILE exp=expression[regtable, expblock, exit, structtable] lastexec=block[regtable, execblock, exit, structtable] expression[regtable, new Block(), exit, structtable])
        {
@@ -363,7 +370,7 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
      if(temp.global) {
        b.instructions.add(new LoadGlobalInstruction(temp.name, r));
      } else {
-       r = temp;
+       b.instructions.add(new LoadVariableInstruction(temp.name, r));
      }
    }
    |  tnode=INTEGER{b.instructions.add(new LoadInstruction("loadi", $tnode.text, r));}
