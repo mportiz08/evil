@@ -17,6 +17,7 @@ public abstract class Instruction
   {
     System.out.println(new ArithmeticInstruction("add", new Register(), new Register(), new Register()).toSparc());
     System.out.println(new ComparisonInstruction("cmp", new Register(), new Register()).toSparc());
+    System.out.println(new BranchInstruction("cbreq", "if", "if-else").toSparc());
     System.out.println(new CallInstruction("foo", null).toSparc());
   }
 }
