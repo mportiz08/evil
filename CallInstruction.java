@@ -14,4 +14,9 @@ public class CallInstruction extends Instruction
   {
     return new String(name + " " + fxn + "\n  loadret " + reg);
   }
+  
+  public String toSparc()
+  {
+    return new String(name + " " + fxn + "\n  nop");
+  }
 }

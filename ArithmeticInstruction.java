@@ -16,4 +16,9 @@ public class ArithmeticInstruction extends Instruction
   {
     return new String(name + " " + src1 + ", " + src2 + ", " + dest);
   }
+  
+  public String toSparc()
+  {
+    return new String(name + " " + src1 + ", " + src2 + ", " + dest);
+  }
 }

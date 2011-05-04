@@ -14,4 +14,16 @@ public class BranchInstruction extends Instruction
   {
     return new String(name + " " + lbl1 + ", " + lbl2);
   }
+  
+  public String toSparc()
+  {
+    if(name.equals("cbreq"))
+    {
+      return new String("be" + " " + lbl1 + "\n  nop\n  bne " + lbl2 + "\n  nop");
+    }
+    else
+    {
+      return new String(name + " " + lbl1);
+    }
+  }
 }
