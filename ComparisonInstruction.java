@@ -14,4 +14,9 @@ public class ComparisonInstruction extends Instruction
   {
     return new String(name + " " + src1 + ", " + src2);
   }
+  
+  public String toSparc()
+  {
+    return new String(name + " " + src1 + ", " + src2);
+  }
 }
