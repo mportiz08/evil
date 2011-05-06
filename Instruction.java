@@ -17,6 +17,7 @@ public abstract class Instruction
   // used to test instructions
   public static void main(String[] args)
   {
+    System.out.println(new LoadGlobalInstruction("a", new Register()).toSparc());
     System.out.println(new UnaryInstruction("del", new Register()).toSparc());
     String[] fieldset = {"blah1","blah2","blah3"};
     System.out.println(new NewInstruction("A", new HashSet<String>(Arrays.asList(fieldset)), new Register()).toSparc());

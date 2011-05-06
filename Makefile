@@ -24,6 +24,9 @@ antlr.generated.iloc : ILOC.g
 safe:
 	\cp *.g *.java ~/.431
 	
+java:
+	javac *.java
+	
 clean:
 	rm *.class
 	rm antlr.generated*

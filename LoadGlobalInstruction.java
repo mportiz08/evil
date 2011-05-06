@@ -10,6 +10,10 @@ public class LoadGlobalInstruction extends Instruction
     this.reg = reg;
   }
   
+  public String toSparc(){
+    return new String("set " + gname + ", " + reg + "\n  ldsw [" + reg + "], " + reg); 
+  }
+  
   public String toString()
   {
     return new String(this.name + " " + this.gname + ", " + this.reg);
