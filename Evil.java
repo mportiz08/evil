@@ -36,6 +36,7 @@ public class Evil
          To create and invoke a tree parser.  Modify with the appropriate
          name of the tree parser and the appropriate start rule.
       */
+      ArrayList<FuncBlock> blist = new ArrayList<FuncBlock>();
       try
       {
          CommonTreeNodeStream nodes = new CommonTreeNodeStream(t);
@@ -48,62 +49,85 @@ public class Evil
          nodes.setTokenStream(tokens);
 
          ILOC iloc = new ILOC(nodes);
-         ArrayList<FuncBlock> blist = new ArrayList<FuncBlock>();
          iloc.generate(blist,structtable);
-         
-        
-         String ilocstr = "";
-         
-         for(FuncBlock b : blist){
-           if(b.name.equals("main")){
-             ilocstr += "@function " + b.name + "\n";
-           }
-         }
-         for(FuncBlock b : blist){
-           if(!b.name.equals("main")){
-             ilocstr += "@function " + b.name + "\n";
-           }
-         }
-         for(FuncBlock b : blist){
-           ilocstr += b.getHeader() + "\n";
-         }
-           
-         for(FuncBlock b : blist){
-           if(b.name.equals("main")){
-             ilocstr += b.getInstructions() + "\n";
-           }
-         }
-         for(FuncBlock b : blist){
-           if(!b.name.equals("main")){
-             ilocstr += b.getInstructions() + "\n";
-           }
-         }
-         if(!_dumpIL){
-           System.out.println(ilocstr);
-         }
-         else{
-           try{
-             FileOutputStream f = new FileOutputStream(_inputFile.replace(".ev", "") + ".il");
-             f.write(ilocstr.getBytes());
-             f.close();
-           }
-           catch(IOException e){
-             e.printStackTrace();
-           }
-         }
       }
       catch (org.antlr.runtime.RecognitionException e)
       {
          error(e.toString());
       }
+         
+        
+         String ilocstr = "";
+         
+        if(!_dumpSPARC)
+        {
+          for(FuncBlock b : blist){
+             if(b.name.equals("main")){
+               ilocstr += "@function " + b.name + "\n";
+             }
+           }
+           for(FuncBlock b : blist){
+             if(!b.name.equals("main")){
+               ilocstr += "@function " + b.name + "\n";
+             }
+           }
+           for(FuncBlock b : blist){
+             ilocstr += b.getHeader() + "\n";
+           }
+             
+           for(FuncBlock b : blist){
+             if(b.name.equals("main")){
+               ilocstr += b.getInstructions() + "\n";
+             }
+           }
+           for(FuncBlock b : blist){
+             if(!b.name.equals("main")){
+               ilocstr += b.getInstructions() + "\n";
+             }
+           }
+           if(!_dumpIL){
+             System.out.println(ilocstr);
+           }
+           else{
+             try{
+               FileOutputStream f = new FileOutputStream(_inputFile.replace(".ev", "") + ".il");
+               f.write(ilocstr.getBytes());
+               f.close();
+             }
+             catch(IOException e){
+               e.printStackTrace();
+             }
+           }
+      }
+      else 
+      {
+        for(FuncBlock b : blist)
+        {
+          if(b.name.equals("main"))
+          {
+            System.out.println(b.getHeader());
+            System.out.println(b.getInstructions());
+          }
+        }
+        for(FuncBlock b : blist)
+        {
+          if(!b.name.equals("main"))
+          {
+            System.out.println(b.getHeader());
+            System.out.println(b.getInstructions());
+          }
+        }
+      }
    }
 
    private static final String DISPLAYAST = "-displayAST";
    private static final String DUMPIL = "-dumpIL";
+   private static final String DUMPSPARC = "-dumpSPARC";
 
    private static String _inputFile = null;
    private static boolean _displayAST = false;
    private static boolean _dumpIL = false;
+   private static boolean _dumpSPARC = false;
 
    private static void parseParameters(String [] args)
    {
@@ -117,6 +141,10 @@ public class Evil
          {
             _dumpIL = true;
          }
+         else if(args[i].equals(DUMPSPARC))
+         {
+            _dumpSPARC = true;
+         } 
          else if (args[i].charAt(0) == '-')
          {
             System.err.println("unexpected option: " + args[i]);
