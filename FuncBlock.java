@@ -3,19 +3,18 @@ import java.util.ArrayList;
 public class FuncBlock extends Block
 {
   public ArrayList<String> locals;
-  public int stackSize;
 
   public FuncBlock()
   {
     super();
     locals = new ArrayList<String>();
-    stackSize = 24;
   }
   
   public String getInstructions(boolean sparc)
   {
     String rstring = "";
     if(sparc){
+       int stackSize = 92 + (locals.size() * 4);
        rstring += name + ":\n  !#PROLOGUE# 0\n  save %sp, -" + stackSize + ", %sp\n  !#PROLOGUE# 1\n";
     }
     else{
