@@ -17,6 +17,6 @@ public class CallInstruction extends Instruction
   
   public String toSparc()
   {
-    return new String(name + " " + fxn + "\n  nop");
+    return new String(name + " " + fxn + "\n  nop\n  " + "mov %o0, " + this.reg);
   }
 }

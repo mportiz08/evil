@@ -14,4 +14,9 @@ public class StoreOutInstruction extends Instruction
   {
     return new String(name + " " + reg + ", " + immediate);
   }
+  
+  public String toSparc()
+  {
+    return new String("mov " + this.reg + ", " + "%o" + immediate);
+  }
 }
