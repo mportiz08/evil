@@ -77,12 +77,12 @@ public class Evil
              
            for(FuncBlock b : blist){
              if(b.name.equals("main")){
-               ilocstr += b.getInstructions() + "\n";
+               ilocstr += b.getInstructions(false) + "\n";
              }
            }
            for(FuncBlock b : blist){
              if(!b.name.equals("main")){
-               ilocstr += b.getInstructions() + "\n";
+               ilocstr += b.getInstructions(false) + "\n";
              }
            }
            if(!_dumpIL){
@@ -106,7 +106,7 @@ public class Evil
           if(b.name.equals("main"))
           {
             System.out.println(b.getHeader());
-            System.out.println(b.getInstructions());
+            System.out.println(b.getInstructions(true));
           }
         }
         for(FuncBlock b : blist)
@@ -114,7 +114,7 @@ public class Evil
           if(!b.name.equals("main"))
           {
             System.out.println(b.getHeader());
-            System.out.println(b.getInstructions());
+            System.out.println(b.getInstructions(true));
           }
         }
       }

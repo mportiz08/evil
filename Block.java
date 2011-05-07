@@ -32,19 +32,21 @@ public class Block
     }
   }
   
-  public String getInstructions()
+  public String getInstructions(boolean sparc)
   {
     String rstring = "";
     rstring += name + ":" + "\n";
     for(Instruction i : instructions)
     {
-      rstring += "  " + i + "\n";
+      String inststr;
+      inststr = (sparc ? i.toSparc() : i.toString());
+      rstring += "  " + inststr + "\n";
     }
     for(Block b : successors)
     {
       if(!b.visited){
         b.visited = true;
-        rstring += b.getInstructions();
+        rstring += b.getInstructions(sparc);
       }
     }
     return rstring;
