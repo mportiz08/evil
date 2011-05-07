@@ -35,7 +35,7 @@ public class Block
   public String getInstructions(boolean sparc)
   {
     String rstring = "";
-    rstring += name + ":" + "\n";
+    rstring += name + ":\n";
     for(Instruction i : instructions)
     {
       String inststr;

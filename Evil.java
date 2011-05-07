@@ -72,7 +72,7 @@ public class Evil
              }
            }
            for(FuncBlock b : blist){
-             ilocstr += b.getHeader() + "\n";
+             ilocstr += b.getHeader(false) + "\n";
            }
              
            for(FuncBlock b : blist){
@@ -101,11 +101,18 @@ public class Evil
       }
       else 
       {
+        System.out.println(".section\t\".text\"");
+        System.out.println(".align 4");
+        for(FuncBlock b : blist)
+        {
+          System.out.println(".global " + b.name);
+          System.out.println(".type\t" + b.name + ", #function");
+        }
         for(FuncBlock b : blist)
         {
           if(b.name.equals("main"))
           {
-            System.out.println(b.getHeader());
+            System.out.println(b.getHeader(true));
             System.out.println(b.getInstructions(true));
           }
         }
@@ -113,7 +120,7 @@ public class Evil
         {
           if(!b.name.equals("main"))
           {
-            System.out.println(b.getHeader());
+            System.out.println(b.getHeader(true));
             System.out.println(b.getInstructions(true));
           }
         }
