@@ -124,6 +124,14 @@ public class Evil
             System.out.println(b.getInstructions(true));
           }
         }
+        System.out.println();
+        System.out.println(".section\t\".rodata\"");
+        System.out.println(".align 8");
+        System.out.println(".asciz\t\"%d \"");
+        System.out.println(".align 8");
+        System.out.println(".asciz\t\"%d\\n\"");
+        System.out.println(".align 8");
+        System.out.println(".asciz\t\"%d\"");
       }
    }
 
