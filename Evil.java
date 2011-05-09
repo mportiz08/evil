@@ -37,13 +37,15 @@ public class Evil
          name of the tree parser and the appropriate start rule.
       */
       ArrayList<FuncBlock> blist = new ArrayList<FuncBlock>();
+      HashMap<String, Type> vartable = null;
       try
       {
          CommonTreeNodeStream nodes = new CommonTreeNodeStream(t);
          nodes.setTokenStream(tokens);
          TypeCheck tparser = new TypeCheck(nodes);
          HashMap<String, StructType> structtable = new HashMap<String, StructType>();
-         tparser.verify(new HashMap<String, FuncType>(), structtable, new HashMap<String, Type>());
+         vartable = new HashMap<String, Type>();
+         tparser.verify(new HashMap<String, FuncType>(), structtable, vartable);
          
          nodes = new CommonTreeNodeStream(t);
          nodes.setTokenStream(tokens);
@@ -103,6 +105,10 @@ public class Evil
       {
         System.out.println(".section\t\".text\"");
         System.out.println(".align 4");
+        for(String s : vartable.keySet())
+        {
+          System.out.println(".common\t" + s + ", 4, 4");
+        }
         for(FuncBlock b : blist)
         {
           System.out.println(".global " + b.name);
