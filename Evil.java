@@ -38,12 +38,13 @@ public class Evil
       */
       ArrayList<FuncBlock> blist = new ArrayList<FuncBlock>();
       HashMap<String, Type> vartable = null;
+      HashMap<String, StructType> structtable = null;
       try
       {
          CommonTreeNodeStream nodes = new CommonTreeNodeStream(t);
          nodes.setTokenStream(tokens);
          TypeCheck tparser = new TypeCheck(nodes);
-         HashMap<String, StructType> structtable = new HashMap<String, StructType>();
+         structtable = new HashMap<String, StructType>();
          vartable = new HashMap<String, Type>();
          tparser.verify(new HashMap<String, FuncType>(), structtable, vartable);
          

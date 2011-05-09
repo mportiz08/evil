@@ -1,9 +1,9 @@
-import java.util.HashMap;
+import java.util.*;
 
 public class StructType extends Type {
   public String name;
-  public HashMap<String, Type> types;
+  public LinkedHashMap<String, Type> types;
   public StructType(){
-   types = new HashMap<String, Type>();
+   types = new LinkedHashMap<String, Type>();
   }
 }
