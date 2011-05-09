@@ -19,6 +19,17 @@ public class ArithmeticInstruction extends Instruction
   
   public String toSparc()
   {
-    return new String(name + " " + src1 + ", " + src2 + ", " + dest);
+    if(name.equals("mult"))
+    {
+      return new String("mov " + src1 + ", " + "%o0\n  mov " + src2 + ", " + "%o1\n  call .mul\n  nop\n  mov %o0, " + dest);
+    }
+    else if(name.equals("div"))
+    {
+      return new String("mov " + src1 + ", " + "%o0\n  mov " + src2 + ", " + "%o1\n  call .div\n  nop\n  mov %o0, " + dest);
+    }
+    else
+    {
+      return new String(name + " " + src1 + ", " + src2 + ", " + dest);
+    }
   }
 }
