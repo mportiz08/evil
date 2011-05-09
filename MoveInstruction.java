@@ -10,6 +10,11 @@ public class MoveInstruction extends Instruction
     this.dest = dest;
   }
   
+  public String toSparc()
+  {
+    return new String(name + " " + src + ", " + dest);
+  }
+  
   public String toString()
   {
     return new String(name + " " + src + ", " + dest);

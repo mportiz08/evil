@@ -10,6 +10,11 @@ public class LoadInstruction extends Instruction
     this.reg = reg;
   }
   
+  public String toSparc()
+  {
+    return new String("set " + immediate + ", " + reg);
+  }
+  
   public String toString()
   {
     return new String(name + " " + immediate + ", " + reg);
