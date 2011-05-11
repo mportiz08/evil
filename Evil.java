@@ -52,7 +52,7 @@ public class Evil
          nodes.setTokenStream(tokens);
 
          ILOC iloc = new ILOC(nodes);
-         iloc.generate(blist,structtable);
+         iloc.generate(blist,structtable,vartable);
       }
       catch (org.antlr.runtime.RecognitionException e)
       {
