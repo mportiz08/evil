@@ -41,9 +41,10 @@ type_sub
    :  ^(STRUCT id nested_decl)
    ;
 
-decl[HashMap<String, Register> regtable] returns [String rstring = new String()]
-   :  ^(DECL ^(TYPE type) rid=id
+decl[HashMap<String, Register> regtable, HashMap<String, StructType> structtable, HashMap<String, Type> vartable] returns [String rstring = new String()]
+   :  ^(DECL ^(TYPE rtype=type[structtable]) rid=id
          { 
+           $vartable.put($rid.rstring, $rtype.rtype);
            $regtable.put($rid.rstring, new Register($rid.rstring));
            $rstring = $rid.rstring;
          }
@@ -51,11 +52,11 @@ decl[HashMap<String, Register> regtable] returns [String rstring = new String()]
    ;
 
 nested_decl
-   :  (decl[new HashMap<String, Register>()])+
+   :  (decl[new HashMap<String, Register>(), new HashMap<String, StructType>(), new HashMap<String, Type>()])+
    ;
    
 declaration[HashMap<String, Register> regtable]
-   :  ^(DECLLIST ^(TYPE type) id_list[regtable])
+   :  ^(DECLLIST ^(TYPE type[new HashMap<String, StructType>()]) id_list[regtable])
    ;
    
 id_list[HashMap<String, Register> regtable]
@@ -68,10 +69,10 @@ id_list[HashMap<String, Register> regtable]
    )+
    ;
 
-type
-   :  INT
-   |  BOOL
-   |  ^(STRUCT id)
+type[HashMap<String, StructType> structtable] returns [Type rtype = null]
+   :  INT {rtype = new IntType();}
+   |  BOOL {rtype = new BoolType();}
+   |  ^(STRUCT rid=id) {rtype = structtable.get($rid.rstring);}
    ;
 
 id returns [String rstring = null]
@@ -83,8 +84,9 @@ function[HashMap<String, Register> regtable, HashMap<String, StructType> structt
    {
      HashMap<String, Register> regtable_copy = new HashMap<String, Register>(regtable);
      Block exit = new Block();
+     HashMap<String, Type> vartablecopy = new HashMap<String, Type>(vartable);
    }
-   :  ^(FUN rid=ID{$rblock.name=$rid.text;exit.name = "exit" + $rblock.name;} params[regtable_copy, rblock] ^(RETTYPE isVoid=return_type) localdeclarations[regtable_copy, rblock] finalblk=statement_list[regtable_copy, rblock, exit,structtable, vartable]
+   :  ^(FUN rid=ID{$rblock.name=$rid.text;exit.name = "exit" + $rblock.name;} params[regtable_copy, rblock, structtable, vartablecopy] ^(RETTYPE isVoid=return_type) localdeclarations[regtable_copy, rblock, structtable, vartablecopy] finalblk=statement_list[regtable_copy, rblock, exit,structtable, vartablecopy]
          { 
            if($finalblk.rblock != null && $isVoid.isVoid)
            {
@@ -98,29 +100,30 @@ function[HashMap<String, Register> regtable, HashMap<String, StructType> structt
        )
    ;
 
-localdeclarations[HashMap<String, Register> regtable_copy, FuncBlock rblock]
-   :  ^(DECLS (localdeclaration[regtable_copy, rblock])*)
+localdeclarations[HashMap<String, Register> regtable_copy, FuncBlock rblock, HashMap<String, StructType> structtable, HashMap<String, Type> vartable]
+   :  ^(DECLS (localdeclaration[regtable_copy, rblock, structtable, vartable])*)
    ;
 
-localdeclaration[HashMap<String, Register> regtable, FuncBlock rblock]
-   :  ^(DECLLIST ^(TYPE type) localid_list[regtable, rblock])
+localdeclaration[HashMap<String, Register> regtable, FuncBlock rblock, HashMap<String, StructType> structtable, HashMap<String, Type> vartable]
+   :  ^(DECLLIST ^(TYPE rtype=type[structtable]) localid_list[regtable, rblock, vartable, $rtype.rtype])
    ;
    
-localid_list[HashMap<String, Register> regtable, FuncBlock rblock]
+localid_list[HashMap<String, Register> regtable, FuncBlock rblock, HashMap<String, Type> vartable, Type type1]
    : (rid=id
       { 
+        $vartable.put($rid.rstring, $type1);
         $regtable.put($rid.rstring, new Register($rid.rstring));
         $rblock.locals.add($rid.rstring);
       }
      )+
    ;
 
-params[HashMap<String, Register> regtable, FuncBlock rblock]
-   :  ^(PARAMS (rdecl = decl[regtable]{rblock.locals.add($rdecl.rstring);})*)
+params[HashMap<String, Register> regtable, FuncBlock rblock, HashMap<String, StructType> structtable, HashMap<String, Type> vartable]
+   :  ^(PARAMS (rdecl = decl[regtable, structtable, vartable]{rblock.locals.add($rdecl.rstring);})*)
    ;
 
 return_type returns [boolean isVoid = false]
-   :  type
+   :  type[new HashMap<String, StructType>()]
    |  VOID{isVoid = true;}
    ;
 
@@ -152,7 +155,7 @@ assignment[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
              //b.instructions.add(new MoveInstruction($rv.r, $lv.r));
            }
            else{
-             b.instructions.add(new AddressInstruction("storeai", $rv.r, $lv.r, $lv.offset));
+             b.instructions.add(new AddressInstruction("storeai", $rv.r, $lv.r, $lv.offset, 0));
            }
         }
    ;
@@ -178,7 +181,7 @@ read[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, St
           b.instructions.add(new MoveInstruction(temp, $reg.r));
         }
         else{
-          b.instructions.add(new AddressInstruction("storeai", temp, $reg.r, $reg.offset));
+          b.instructions.add(new AddressInstruction("storeai", temp, $reg.r, $reg.offset, 0));
         }
       }
    ;
@@ -230,7 +233,7 @@ loop[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, St
       execblock.name = "L" + c + "whileexec";
       continueblock.name = "L" + c + "whilecont";
    }
-   :  ^(WHILE exp=expression[regtable, expblock, exit, structtable] lastexec=block[regtable, execblock, exit, structtable, vartable] expression[regtable, new Block(), exit, structtable, vartable])
+   :  ^(WHILE exp=expression[regtable, expblock, exit, structtable, vartable] lastexec=block[regtable, execblock, exit, structtable, vartable] expression[regtable, new Block(), exit, structtable, vartable])
        {
          Register condition = new Register();
          expblock.instructions.add(new LoadInstruction("loadi", "1", condition));
@@ -280,22 +283,22 @@ lvalue_h[HashMap<String, Register> regtable, Block b, Register in, HashMap<Strin
    :  rid=id{$r = regtable.get($rid.rstring);}
    | ^(DOT lv=lvalue_h[regtable, b, in, structtable, vartable] rid=id)
       {
-        b.instructions.add(new AddressInstruction("loadai", $lv.r, $r, "@" + $rid.rstring));
+        b.instructions.add(new AddressInstruction("loadai", $lv.r, $r, "@" + $rid.rstring, 0));
       }
    ;
 
 expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, StructType> structtable, HashMap<String, Type> vartable] returns [Register r = new Register(), LinkedHashMap<String, Type> structfields = null]
-   : ^(AND lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("and", $lv.r, $rv.r, r));})
-   | ^(OR lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("or", $lv.r, $rv.r, r));})
+   : ^(AND lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("and", $lv.r, $rv.r, $r));})
+   | ^(OR lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("or", $lv.r, $rv.r, $r));})
    | ^(EQ lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable]
         {
           Register lr = new Register();
           Register rr = new Register();
           b.instructions.add(new MoveInstruction($lv.r, lr));
           b.instructions.add(new MoveInstruction($rv.r, rr));
-          b.instructions.add(new LoadInstruction("loadi", "0", r));
+          b.instructions.add(new LoadInstruction("loadi", "0", $r));
           b.instructions.add(new ComparisonInstruction("comp", lr, rr));
-          b.instructions.add(new MoveConditionInstruction("moveq", "1", r));
+          b.instructions.add(new MoveConditionInstruction("moveq", "1", $r));
         }
       )
    | ^(LT lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable]
@@ -304,9 +307,9 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
           Register rr = new Register();
           b.instructions.add(new MoveInstruction($lv.r, lr));
           b.instructions.add(new MoveInstruction($rv.r, rr));
-          b.instructions.add(new LoadInstruction("loadi", "0", r));
+          b.instructions.add(new LoadInstruction("loadi", "0", $r));
           b.instructions.add(new ComparisonInstruction("comp", lr, rr));
-          b.instructions.add(new MoveConditionInstruction("movlt", "1", r));
+          b.instructions.add(new MoveConditionInstruction("movlt", "1", $r));
         }
       )
    | ^(GT lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] 
@@ -315,9 +318,9 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
           Register rr = new Register();
           b.instructions.add(new MoveInstruction($lv.r, lr));
           b.instructions.add(new MoveInstruction($rv.r, rr));
-          b.instructions.add(new LoadInstruction("loadi", "0", r));
+          b.instructions.add(new LoadInstruction("loadi", "0", $r));
           b.instructions.add(new ComparisonInstruction("comp", lr, rr));
-          b.instructions.add(new MoveConditionInstruction("movgt", "1", r));
+          b.instructions.add(new MoveConditionInstruction("movgt", "1", $r));
         }
       )
    | ^(NE lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable]
@@ -326,9 +329,9 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
           Register rr = new Register();
           b.instructions.add(new MoveInstruction($lv.r, lr));
           b.instructions.add(new MoveInstruction($rv.r, rr));
-          b.instructions.add(new LoadInstruction("loadi", "0", r));
+          b.instructions.add(new LoadInstruction("loadi", "0", $r));
           b.instructions.add(new ComparisonInstruction("comp", lr, rr));
-          b.instructions.add(new MoveConditionInstruction("movne", "1", r));
+          b.instructions.add(new MoveConditionInstruction("movne", "1", $r));
         }
       )
    | ^(LE lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] 
@@ -337,9 +340,9 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
           Register rr = new Register();
           b.instructions.add(new MoveInstruction($lv.r, lr));
           b.instructions.add(new MoveInstruction($rv.r, rr));
-          b.instructions.add(new LoadInstruction("loadi", "0", r));
+          b.instructions.add(new LoadInstruction("loadi", "0", $r));
           b.instructions.add(new ComparisonInstruction("comp", lr, rr));
-          b.instructions.add(new MoveConditionInstruction("movle", "1", r));
+          b.instructions.add(new MoveConditionInstruction("movle", "1", $r));
         }
       )
    | ^(GE lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable]
@@ -348,24 +351,27 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
           Register rr = new Register();
           b.instructions.add(new MoveInstruction($lv.r, lr));
           b.instructions.add(new MoveInstruction($rv.r, rr));
-          b.instructions.add(new LoadInstruction("loadi", "0", r));
+          b.instructions.add(new LoadInstruction("loadi", "0", $r));
           b.instructions.add(new ComparisonInstruction("comp", lr, rr));
-          b.instructions.add(new MoveConditionInstruction("movge", "1", r));
+          b.instructions.add(new MoveConditionInstruction("movge", "1", $r));
         }
       )
-   | ^(PLUS lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("add", $lv.r, $rv.r, r));})
-   | ^(MINUS lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("sub", $lv.r, $rv.r, r));})
-   | ^(TIMES lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable]  {b.instructions.add(new ArithmeticInstruction("mult", $lv.r, $rv.r, r));})
-   | ^(DIVIDE lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("div", $lv.r, $rv.r, r));})
-   | ^(NOT uv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("xori", $uv.r, new Register(), r));/*xori r, true, dest*/})
-   | ^(NEG uv=expression[regtable, b, exit, structtable, vartable]  {b.instructions.add(new ArithmeticInstruction("mult", $uv.r, new Register(), r));/*multi r, -1, dest*/})
+   | ^(PLUS lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("add", $lv.r, $rv.r, $r));})
+   | ^(MINUS lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("sub", $lv.r, $rv.r, $r));})
+   | ^(TIMES lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable]  {b.instructions.add(new ArithmeticInstruction("mult", $lv.r, $rv.r, $r));})
+   | ^(DIVIDE lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("div", $lv.r, $rv.r, $r));})
+   | ^(NOT uv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("xori", $uv.r, new Register(), $r));/*xori r, true, dest*/})
+   | ^(NEG uv=expression[regtable, b, exit, structtable, vartable]  {b.instructions.add(new ArithmeticInstruction("mult", $uv.r, new Register(), $r));/*multi r, -1, dest*/})
    | ^(DOT reg=expression[regtable, b, exit, structtable, vartable] rid=id
         {
-          ArrayList<String> temp = new ArrayList<String>($reg.structfields.keySet());
-          int offset = 4 * temp.indexof($rid.rstring);
-          b.instructions.add(new AddressInstruction("loadai", $reg.r, r, "@" + $rid.rstring, offset));
+          int offset = 0;
+          if($reg.structfields != null){
+            ArrayList<String> temp = new ArrayList<String>($reg.structfields.keySet());
+            offset = 4 * temp.indexOf($rid.rstring);
+          }
+          b.instructions.add(new AddressInstruction("loadai", $reg.r, $r, "@" + $rid.rstring, offset));
           
-          if($reg.structfields.get($rid.rstring).isStruct()){
+          if($reg.structfields != null && $reg.structfields.get($rid.rstring).isStruct()){
             $structfields = ((StructType)$reg.structfields.get($rid.rstring)).types;
           }
         }
@@ -374,26 +380,26 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
    {
      Register temp = regtable.get($rid.rstring);
      if(temp.global) {
-       b.instructions.add(new LoadGlobalInstruction(temp.name, r));
+       b.instructions.add(new LoadGlobalInstruction(temp.name, $r));
      } else {
-       b.instructions.add(new LoadVariableInstruction(temp.name, r));
+       b.instructions.add(new LoadVariableInstruction(temp.name, $r));
      }
      if(vartable.get($rid.rstring).isStruct()){
        $structfields = ((StructType)vartable.get($rid.rstring)).types;
      }
    }
-   |  tnode=INTEGER{b.instructions.add(new LoadInstruction("loadi", $tnode.text, r));}
-   |  TRUE{b.instructions.add(new LoadInstruction("loadi", "1", r));}
-   |  FALSE{b.instructions.add(new LoadInstruction("loadi", "0", r));}
+   |  tnode=INTEGER{b.instructions.add(new LoadInstruction("loadi", $tnode.text, $r));}
+   |  TRUE{b.instructions.add(new LoadInstruction("loadi", "1", $r));}
+   |  FALSE{b.instructions.add(new LoadInstruction("loadi", "0", $r));}
    |  ^(NEW rid=id)
        {
          HashSet<String> temp = new HashSet<String>(structtable.get($rid.rstring).types.keySet());
-         b.instructions.add(new NewInstruction($rid.rstring, temp, r));
+         b.instructions.add(new NewInstruction($rid.rstring, temp, $r));
        }
    |  NULL{/*?*/}
    |  ^(INVOKE rid=id arguments[regtable, b, exit, structtable,vartable])
       {
-        b.instructions.add(new CallInstruction($rid.rstring, r));
+        b.instructions.add(new CallInstruction($rid.rstring, $r));
       }
    ;
    
