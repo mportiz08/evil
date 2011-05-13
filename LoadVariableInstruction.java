@@ -10,6 +10,11 @@ public class LoadVariableInstruction extends Instruction
     this.reg = reg;
   }
   
+  public String toSparc()
+  {
+    return new String("nop");
+  }
+  
   public String toString()
   {
     return new String(this.name + " rarp, " + this.vname + ", " + this.reg);

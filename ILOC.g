@@ -270,7 +270,7 @@ ret[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, Str
      }
    ;
    
-lvalue[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, StructType> structtable, HashMap<String, Type> vartable] returns [Register r = new Register(), String offset = null]
+lvalue[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, StructType> structtable, HashMap<String, Type> vartable] returns [Register r = new Register(), String offset = null, LinkedHashMap<String, Type> structfields = null]
    :  rid=id{$r = $regtable.get($rid.rstring);}
    | ^(DOT lv=lvalue_h[regtable, b, $r, structtable, vartable] rid=id)
       {
@@ -279,11 +279,25 @@ lvalue[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, 
       }
    ;
 
-lvalue_h[HashMap<String, Register> regtable, Block b, Register in, HashMap<String, StructType> structtable, HashMap<String, Type> vartable] returns [Register r = new Register()]
+lvalue_h[HashMap<String, Register> regtable, Block b, Register in, HashMap<String, StructType> structtable, HashMap<String, Type> vartable] returns [Register r = new Register(), LinkedHashMap<String, Type> structfields = null]
    :  rid=id{$r = regtable.get($rid.rstring);}
    | ^(DOT lv=lvalue_h[regtable, b, in, structtable, vartable] rid=id)
-      {
-        b.instructions.add(new AddressInstruction("loadai", $lv.r, $r, "@" + $rid.rstring, 0));
+      {   
+        int offset = 0;
+        if($lv.structfields != null){
+          ArrayList<String> temp = new ArrayList<String>($lv.structfields.keySet());
+          offset = 4 * temp.indexOf($rid.rstring);
+        }
+        
+        if($lv.r.global) {
+          b.instructions.add(new LoadGlobalInstruction($rid.rstring, $r));
+        } else {
+          b.instructions.add(new AddressInstruction("loadai", $lv.r, $r, "@" + $rid.rstring, offset));
+        }
+        
+        if($lv.structfields != null && $lv.structfields.get($rid.rstring).isStruct()){
+            $structfields = ((StructType)$lv.structfields.get($rid.rstring)).types;
+        }
       }
    ;
 
