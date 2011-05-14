@@ -10,6 +10,10 @@ public class StoreVariableInstruction extends Instruction
     this.reg = reg;
   }
   
+  public String toSparc(){
+    return "nop";
+  }
+  
   public String toString()
   {
     return new String(this.name + " " + this.reg + ", rarp, " + this.vname);

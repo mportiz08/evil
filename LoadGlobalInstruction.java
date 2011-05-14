@@ -11,7 +11,7 @@ public class LoadGlobalInstruction extends Instruction
   }
   
   public String toSparc(){
-    return new String("set " + gname + ", " + reg + "\n  ldsw [" + reg + "], " + reg); 
+    return new String("set " + gname + ", " + reg.sparcName + "\n  ldsw [" + reg.sparcName + "], " + reg.sparcName); 
   }
   
   public String toString()

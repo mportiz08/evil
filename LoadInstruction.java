@@ -12,7 +12,7 @@ public class LoadInstruction extends Instruction
   
   public String toSparc()
   {
-    return new String("set " + immediate + ", " + reg);
+    return new String("set " + immediate + ", " + reg.sparcName);
   }
   
   public String toString()

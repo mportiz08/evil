@@ -10,6 +10,11 @@ public class MoveConditionInstruction extends Instruction
     this.dest = dest;
   }
   
+  public String toSparc()
+  {
+    return new String(name + " " + immediate + ", " + dest.sparcName);
+  }
+  
   public String toString()
   {
     return new String(name + " " + immediate + ", " + dest);

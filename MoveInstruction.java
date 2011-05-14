@@ -12,7 +12,7 @@ public class MoveInstruction extends Instruction
   
   public String toSparc()
   {
-    return new String(name + " " + src + ", " + dest);
+    return new String(name + " " + src.sparcName + ", " + dest.sparcName);
   }
   
   public String toString()

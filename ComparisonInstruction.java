@@ -17,6 +17,6 @@ public class ComparisonInstruction extends Instruction
   
   public String toSparc()
   {
-    return new String(name + " " + src1 + ", " + src2);
+    return new String(name + " " + src1.sparcName + ", " + src2.sparcName);
   }
 }

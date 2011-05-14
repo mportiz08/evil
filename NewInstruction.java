@@ -17,8 +17,8 @@ public class NewInstruction extends Instruction
   }
   
   public String toSparc(){
-    return new String("mov " + fields.size()*4 + ", " + sparcRegister + "\n  " + "call malloc\n  nop\n  mov " + sparcRegister
-       + ", " + reg);
+    return new String("mov " + fields.size()*4 + ", " + sparcRegister.sparcName + "\n  " + "call malloc\n  nop\n  mov " + sparcRegister.sparcName
+       + ", " + reg.sparcName);
   }
   
   public String toString()

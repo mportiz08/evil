@@ -23,15 +23,15 @@ public class ArithmeticInstruction extends Instruction
   {
     if(name.equals("mult"))
     {
-      return new String("mov " + src1 + ", " + "%o0\n  mov " + src2 + ", " + "%o1\n  call .mul\n  nop\n  mov %o0, " + dest);
+      return new String("mov " + src1.sparcName + ", " + "%o0\n  mov " + src2.sparcName + ", " + "%o1\n  call .mul\n  nop\n  mov %o0, " + dest.sparcName);
     }
     else if(name.equals("div"))
     {
-      return new String("mov " + src1 + ", " + "%o0\n  mov " + src2 + ", " + "%o1\n  call .div\n  nop\n  mov %o0, " + dest);
+      return new String("mov " + src1.sparcName + ", " + "%o0\n  mov " + src2.sparcName + ", " + "%o1\n  call .div\n  nop\n  mov %o0, " + dest.sparcName);
     }
     else
     {
-      return new String(name + " " + src1 + ", " + src2 + ", " + dest);
+      return new String(name + " " + src1.sparcName + ", " + src2.sparcName + ", " + dest.sparcName);
     }
   }
 }

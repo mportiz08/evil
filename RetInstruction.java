@@ -29,7 +29,7 @@ public class RetInstruction extends Instruction
     }
     else
     {
-      return new String("mov " + this.reg + ", %i0\n  ret\n  restore");
+      return new String("mov " + this.reg.sparcName + ", %i0\n  ret\n  restore");
     }
   }
 }
