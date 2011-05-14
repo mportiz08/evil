@@ -19,7 +19,7 @@ public class AddressInstruction extends Instruction
     if(name.equals("storeai")) {
       return new String("st " + src + ", [" + dest + "-" + sparcOffset + "]");
     } else if(name.equals("loadai")) {
-      return new String("ld [" + src + "-" + sparcOffset + "], " + dest);
+      return new String("ld [" + src.sparcName + "-" + sparcOffset + "], " + dest);
     } else {
       return new String("cheater");
     }

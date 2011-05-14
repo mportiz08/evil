@@ -119,7 +119,21 @@ localid_list[HashMap<String, Register> regtable, FuncBlock rblock, HashMap<Strin
    ;
 
 params[HashMap<String, Register> regtable, FuncBlock rblock, HashMap<String, StructType> structtable, HashMap<String, Type> vartable]
-   :  ^(PARAMS (rdecl = decl[regtable, structtable, vartable]{rblock.locals.add($rdecl.rstring);})*)
+   @init
+   {
+     ArrayList<Register> reglist = new ArrayList<Register>();
+   }
+   :  ^(PARAMS (rdecl = decl[regtable, structtable, vartable]
+        {
+          reglist.add($regtable.get($rdecl.rstring));
+          $rblock.locals.add($rdecl.rstring);
+        })*)
+        {
+          for(int i = 0; i < reglist.size(); i++){
+             //$reglist.get(i).name = "\%i" + i;
+             reglist.get(i).sparcName = "\%i" + i;
+           }
+        }
    ;
 
 return_type returns [boolean isVoid = false]
@@ -155,7 +169,7 @@ assignment[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
              //b.instructions.add(new MoveInstruction($rv.r, $lv.r));
            }
            else{
-             b.instructions.add(new AddressInstruction("storeai", $rv.r, $lv.r, $lv.offset, 0));
+             b.instructions.add(new AddressInstruction("storeai", $rv.r, $lv.r, $lv.offset, $lv.sparcOffset));
            }
         }
    ;
@@ -181,7 +195,7 @@ read[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, St
           b.instructions.add(new MoveInstruction(temp, $reg.r));
         }
         else{
-          b.instructions.add(new AddressInstruction("storeai", temp, $reg.r, $reg.offset, 0));
+          b.instructions.add(new AddressInstruction("storeai", temp, $reg.r, $reg.offset, $reg.sparcOffset));
         }
       }
    ;
@@ -270,18 +284,34 @@ ret[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, Str
      }
    ;
    
-lvalue[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, StructType> structtable, HashMap<String, Type> vartable] returns [Register r = new Register(), String offset = null, LinkedHashMap<String, Type> structfields = null]
+lvalue[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, StructType> structtable, HashMap<String, Type> vartable] returns [Register r = new Register(), String offset = null, int sparcOffset = 0]
    :  rid=id{$r = $regtable.get($rid.rstring);}
-   | ^(DOT lv=lvalue_h[regtable, b, $r, structtable, vartable] rid=id)
+   | ^(DOT lv=lvalue_h[regtable, b, $r, structtable, vartable, true] rid=id)
       {
         $r = $lv.r;
         $offset = "@" + $rid.rstring;
+        if($lv.structfields != null){
+          ArrayList<String> temp = new ArrayList<String>($lv.structfields.keySet());
+          $sparcOffset = 4 * temp.indexOf($rid.rstring);
+        }
       }
    ;
 
-lvalue_h[HashMap<String, Register> regtable, Block b, Register in, HashMap<String, StructType> structtable, HashMap<String, Type> vartable] returns [Register r = new Register(), LinkedHashMap<String, Type> structfields = null]
-   :  rid=id{$r = regtable.get($rid.rstring);}
-   | ^(DOT lv=lvalue_h[regtable, b, in, structtable, vartable] rid=id)
+lvalue_h[HashMap<String, Register> regtable, Block b, Register in, HashMap<String, StructType> structtable, HashMap<String, Type> vartable, boolean initial] returns [Register r = new Register(), LinkedHashMap<String, Type> structfields = null]
+   :  rid=id
+      {
+        Register temp = regtable.get($rid.rstring);
+        if(temp.global) {
+          b.instructions.add(new LoadGlobalInstruction(temp.name, $r));
+        } else {
+          b.instructions.add(new LoadVariableInstruction(temp.name, $r));
+          $r = temp;
+        }
+        if($vartable.get($rid.rstring).isStruct()){
+          $structfields = ((StructType)vartable.get($rid.rstring)).types;
+        }
+      }
+   | ^(DOT lv=lvalue_h[regtable, b, in, structtable, vartable, false] rid=id)
       {   
         int offset = 0;
         if($lv.structfields != null){
@@ -289,11 +319,7 @@ lvalue_h[HashMap<String, Register> regtable, Block b, Register in, HashMap<Strin
           offset = 4 * temp.indexOf($rid.rstring);
         }
         
-        if($lv.r.global) {
-          b.instructions.add(new LoadGlobalInstruction($rid.rstring, $r));
-        } else {
-          b.instructions.add(new AddressInstruction("loadai", $lv.r, $r, "@" + $rid.rstring, offset));
-        }
+        b.instructions.add(new AddressInstruction("loadai", $lv.r, $r, "@" + $rid.rstring, offset));
         
         if($lv.structfields != null && $lv.structfields.get($rid.rstring).isStruct()){
             $structfields = ((StructType)$lv.structfields.get($rid.rstring)).types;

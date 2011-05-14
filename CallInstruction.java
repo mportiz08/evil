@@ -2,12 +2,14 @@ public class CallInstruction extends Instruction
 {
   public Register reg;
   public String fxn;
+  public Register sparcRegister;
   
   public CallInstruction(String fxn, Register reg)
   {
     super("call");
     this.fxn = fxn;
     this.reg = reg;
+    sparcRegister = new Register("%o0");
   }
   
   public String toString()

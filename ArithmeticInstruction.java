@@ -3,6 +3,7 @@ public class ArithmeticInstruction extends Instruction
   public Register src1;
   public Register src2;
   public Register dest;
+  public Register sparcRegister;
   
   public ArithmeticInstruction(String name, Register src1, Register src2, Register dest)
   {
@@ -10,6 +11,7 @@ public class ArithmeticInstruction extends Instruction
     this.src1 = src1;
     this.src2 = src2;
     this.dest = dest;
+    sparcRegister = new Register("%o0");
   }
   
   public String toString()

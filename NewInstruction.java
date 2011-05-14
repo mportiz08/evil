@@ -13,7 +13,7 @@ public class NewInstruction extends Instruction
     this.structname = structname;
     this.fields = fields;
     this.reg = reg;
-    sparcRegister = new Register();
+    sparcRegister = new Register("%o0");
   }
   
   public String toSparc(){
