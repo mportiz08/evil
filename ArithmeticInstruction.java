@@ -43,6 +43,8 @@ public class ArithmeticInstruction extends Instruction
     ArrayList<Register> ret = new ArrayList<Register>();
     ret.add(src1);
     ret.add(src2);
+    ret.add(sparcRegister);
+    ret.add(sparcRegister2);
     return ret;
   }
   

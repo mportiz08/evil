@@ -19,9 +19,9 @@ public class Register extends Operand
   {
     counter++;
     num = counter;
-    //sparcName = "r" + new Integer(num).toString();
+    sparcName = "r" + new Integer(num).toString();
     this.name = name;
-    this.sparcName = name;
+    //this.sparcName = name;
     global = false;
   }
   
