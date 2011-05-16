@@ -85,6 +85,7 @@ function[HashMap<String, Register> regtable, HashMap<String, StructType> structt
      HashMap<String, Register> regtable_copy = new HashMap<String, Register>(regtable);
      Block exit = new Block();
      HashMap<String, Type> vartablecopy = new HashMap<String, Type>(vartable);
+     rblock.exit = exit;
    }
    :  ^(FUN rid=ID{$rblock.name=$rid.text;exit.name = "exit" + $rblock.name;} params[regtable_copy, rblock, structtable, vartablecopy] ^(RETTYPE isVoid=return_type) localdeclarations[regtable_copy, rblock, structtable, vartablecopy] finalblk=statement_list[regtable_copy, rblock, exit,structtable, vartablecopy]
          { 

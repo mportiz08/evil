@@ -94,4 +94,9 @@ public class Block
       }
     }
   }
+  
+  public void createGlobalInfo()
+  {
+    // TODO
+  }
 }

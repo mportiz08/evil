@@ -3,6 +3,7 @@ import java.util.ArrayList;
 public class FuncBlock extends Block
 {
   public ArrayList<String> locals;
+  public Block exit;
 
   public FuncBlock()
   {
