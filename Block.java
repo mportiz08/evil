@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 
 public class Block
 {
@@ -8,24 +7,27 @@ public class Block
   public ArrayList<Instruction> instructions;
   public ArrayList<Block> successors;
   public ArrayList<Block> predecessors;
-  public HashSet<Register> gen;
-  public HashSet<Register> kill;
-  public HashSet<Register> liveOut;
+  public TreeSet<Register> gen;
+  public TreeSet<Register> kill;
+  public TreeSet<Register> liveOut;
   
   public String name;
   
   boolean visited;
+  boolean genkill;
 
   public Block()
   {
+    genkill = false;
     visited = false;
     //name = "exit";
     instructions = new ArrayList<Instruction>();
     successors = new ArrayList<Block>();
     predecessors = new ArrayList<Block>();
-    gen = new HashSet<Register>();
-    kill = new HashSet<Register>();
-    liveOut = new HashSet<Register>();
+    RegisterComparator rc = new RegisterComparator();
+    gen = new TreeSet<Register>(rc);
+    kill = new TreeSet<Register>(rc);
+    liveOut = new TreeSet<Register>(rc);
   }
   
   public void printTree(){
@@ -74,5 +76,22 @@ public class Block
     //System.out.println("finished subtree");
     
     return str;
+  }
+  
+  public void createLocalInfo(){
+    for(Instruction i : instructions)
+    {
+      for(Register src : i.getSources())
+      {
+        if(!kill.contains(src))
+        {
+          gen.add(src);
+        }
+      }
+      for(Register dest : i.getDests())
+      {
+        kill.add(dest);
+      }
+    }
   }
 }

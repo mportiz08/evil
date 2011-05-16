@@ -11,35 +11,34 @@ public class RegisterAllocator
   
   public void color()
   {
-    for(Block b : this.blocks)
-    {
+    for(Block b : blocks)
+    { 
       localInfo(b);
-      globalInfo(b);
-      liveSet(b);
     }
+    //globalInfo(b);
+    //liveSet(b);
   }
   
   private void localInfo(Block b)
   {
-    for(Instruction i : b.instructions)
-    {
-      for(Register src : i.getSources())
-      {
-        if(!b.kill.contains(src))
-        {
-          b.gen.add(src);
-        }
-      }
-      for(Register dest : i.getDests())
-      {
-        b.kill.add(dest);
-      }
-    }
+     if(!b.genkill)
+     {
+       b.createLocalInfo();
+       System.out.println("GEN for " + b.name);
+       System.out.println(b.gen);
+       System.out.println("KILL for " + b.name);
+       System.out.println(b.kill);
+       b.genkill = true;
+       for(Block bs : b.successors)
+       {
+         localInfo(bs);
+       }
+     }
   }
   
   private void globalInfo(Block b)
   {
-    
+    //while
   }
   
   private void liveSet(Block b)
