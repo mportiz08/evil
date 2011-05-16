@@ -91,10 +91,12 @@ function[HashMap<String, Register> regtable, HashMap<String, StructType> structt
            if($finalblk.rblock != null && $isVoid.isVoid)
            {
              $finalblk.rblock.successors.add(exit);
+             exit.predecessors.add($finalblk.rblock);
            }
            else if($isVoid.isVoid)
            {
              rblock.successors.add(exit);
+             exit.predecessors.add(rblock);
            }
          }
        )
@@ -215,14 +217,18 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Str
           b.instructions.add(new ComparisonInstruction("comp", condition, $reg.r));
           continueblock.name = "L" + c + "cont";
           b.successors.add(thenblock);
+          thenblock.predecessors.add(thenblock);
           if(elseLast == null){
              b.successors.add(continueblock);
+             continueblock.predecessors.add(b);
              b.instructions.add(new BranchInstruction("cbreq", thenblock.name, continueblock.name));
           }
           else{
              b.successors.add(elseblock);
+             elseblock.predecessors.add(b);
              if(!$thenLast.rblock.name.substring(0, 4).equals("exit")){
                $elseLast.rblock.successors.add(continueblock);
+               continueblock.predecessors.add($elseLast.rblock);
                $elseLast.rblock.instructions.add(new JumpInstruction(continueblock.name));
                b.instructions.add(new BranchInstruction("cbreq", thenblock.name, elseblock.name));
              }
@@ -230,6 +236,7 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Str
           
           if(!$thenLast.rblock.name.equals("exit")){
             $thenLast.rblock.successors.add(continueblock);
+            continueblock.predecessors.add($thenLast.rblock);
             $thenLast.rblock.instructions.add(new JumpInstruction(continueblock.name));
           }
           
@@ -254,9 +261,13 @@ loop[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, St
          expblock.instructions.add(new ComparisonInstruction("comp", condition, $exp.r));
          expblock.instructions.add(new BranchInstruction("cbreq", execblock.name, continueblock.name));
          b.successors.add(expblock);
+         expblock.predecessors.add(b);
          expblock.successors.add(execblock);
+         execblock.predecessors.add(expblock);
          expblock.successors.add(continueblock);
+         continueblock.predecessors.add(expblock);
          $lastexec.rblock.successors.add(expblock);
+         expblock.predecessors.add($lastexec.rblock);
          $lastexec.rblock.instructions.add(new JumpInstruction(expblock.name));
        }
    ;
@@ -273,6 +284,7 @@ ret[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, Str
    : ^(RETURN (reg=expression[regtable, b, exit, structtable, vartable])?)
       {
         b.successors.add(exit);
+        exit.predecessors.add(b);
         if(reg==null){
           b.instructions.add(new RetInstruction());
         }
