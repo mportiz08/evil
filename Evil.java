@@ -143,6 +143,9 @@ public class Evil
         System.out.println(".LCC2");
         System.out.println(".asciz\t\"%d\"");
       }
+      
+      RegisterAllocator ra = new RegisterAllocator(blist);
+      ra.color();
    }
 
    private static final String DISPLAYAST = "-displayAST";

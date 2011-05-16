@@ -2,9 +2,9 @@ import java.util.*;
 
 public class RegisterAllocator
 {
-  private ArrayList<Block> blocks;
+  private ArrayList<FuncBlock> blocks;
   
-  public RegisterAllocator(ArrayList<Block> blocks)
+  public RegisterAllocator(ArrayList<FuncBlock> blocks)
   {
     this.blocks = blocks;
   }
@@ -23,13 +23,23 @@ public class RegisterAllocator
   {
     for(Instruction i : b.instructions)
     {
-      
+      for(Register src : i.getSources())
+      {
+        if(!b.kill.contains(src))
+        {
+          b.gen.add(src);
+        }
+      }
+      for(Register dest : i.getDests())
+      {
+        b.kill.add(dest);
+      }
     }
   }
   
   private void globalInfo(Block b)
   {
-  
+    
   }
   
   private void liveSet(Block b)
