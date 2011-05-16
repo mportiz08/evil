@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class LoadGlobalInstruction extends Instruction
 {
   private String gname;
@@ -17,5 +19,11 @@ public class LoadGlobalInstruction extends Instruction
   public String toString()
   {
     return new String(this.name + " " + this.gname + ", " + this.reg);
+  }
+  
+  public ArrayList<Register> getDests(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    ret.add(reg);
+    return ret;
   }
 }

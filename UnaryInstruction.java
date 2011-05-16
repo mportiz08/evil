@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class UnaryInstruction extends Instruction
 {
   public Register reg;
@@ -31,5 +33,27 @@ public class UnaryInstruction extends Instruction
   public String toString()
   {
     return new String(name + " " + reg);
+  }
+  
+  public ArrayList<Register> getSources(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    if(name.equals("del") || name.equals("print") || name.equals("println")){
+       ret.add(reg);
+    }
+    return ret;
+  }
+  
+  public ArrayList<Register> getDests(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    if(name.equals("read")){
+      ret.add(reg);
+      ret.add(sparcRegister);
+      ret.add(sparcRegister2);
+    }
+    else if(name.equals("print") || name.equals("println")){
+      ret.add(sparcRegister);
+      ret.add(sparcRegister2);
+    }
+    return ret;
   }
 }

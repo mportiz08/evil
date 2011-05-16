@@ -25,4 +25,16 @@ public class NewInstruction extends Instruction
   {
     return new String(name + " " + structname + " " + fields + ", " + reg);
   }
+  
+  public ArrayList<Register> getSources(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    return ret;
+  }
+  
+  public ArrayList<Register> getDests(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    ret.add(reg);
+    ret.add(sparcRegister);//notsure
+    return ret;
+  }
 }

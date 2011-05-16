@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class MoveConditionInstruction extends Instruction
 {
   public String immediate;
@@ -18,5 +20,11 @@ public class MoveConditionInstruction extends Instruction
   public String toString()
   {
     return new String(name + " " + immediate + ", " + dest);
+  }
+  
+  public ArrayList<Register> getDests(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    ret.add(dest);
+    return ret;
   }
 }

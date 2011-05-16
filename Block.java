@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Block
 {
@@ -7,6 +8,9 @@ public class Block
   public ArrayList<Instruction> instructions;
   public ArrayList<Block> successors;
   public ArrayList<Block> predecessors;
+  public HashSet<Register> gen;
+  public HashSet<Register> kill;
+  public HashSet<Register> liveOut;
   
   public String name;
   
@@ -19,6 +23,9 @@ public class Block
     instructions = new ArrayList<Instruction>();
     successors = new ArrayList<Block>();
     predecessors = new ArrayList<Block>();
+    gen = new HashSet<Register>();
+    kill = new HashSet<Register>();
+    liveOut = new HashSet<Register>();
   }
   
   public void printTree(){

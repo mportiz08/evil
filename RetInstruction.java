@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class RetInstruction extends Instruction
 {
   public String str;
@@ -31,5 +33,11 @@ public class RetInstruction extends Instruction
     {
       return new String("mov " + this.reg.sparcName + ", %i0\n  ret\n  restore");
     }
+  }
+  
+  public ArrayList<Register> getSources(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    ret.add(reg);
+    return ret;
   }
 }

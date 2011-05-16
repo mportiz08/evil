@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class LoadVariableInstruction extends Instruction
 {
   private String vname;

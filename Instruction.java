@@ -26,4 +26,14 @@ public abstract class Instruction
     System.out.println(new BranchInstruction("cbreq", "if", "if-else").toSparc());
     System.out.println(new CallInstruction("foo", null).toSparc());
   }
+  
+  public ArrayList<Register> getSources(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    return ret;
+  }
+  
+  public ArrayList<Register> getDests(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    return ret;
+  }
 }

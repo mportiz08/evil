@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class ComparisonInstruction extends Instruction
 {
   public Register src1;
@@ -18,5 +20,12 @@ public class ComparisonInstruction extends Instruction
   public String toSparc()
   {
     return new String(name + " " + src1.sparcName + ", " + src2.sparcName);
+  }
+  
+  public ArrayList<Register> getSources(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    ret.add(src1);
+    ret.add(src2);
+    return ret;
   }
 }

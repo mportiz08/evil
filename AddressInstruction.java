@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class AddressInstruction extends Instruction
 {
   public Register src;
@@ -34,5 +36,17 @@ public class AddressInstruction extends Instruction
     } else {
       return new String(name + " " + src + ", " + dest + ", " + offset);
     }
+  }
+  
+  public ArrayList<Register> getSources(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    ret.add(src);
+    return ret;
+  }
+  
+  public ArrayList<Register> getDests(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    ret.add(dest);
+    return ret;
   }
 }

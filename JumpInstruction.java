@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class JumpInstruction extends Instruction
 {
   public String lbl;

@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class MoveInstruction extends Instruction
 {
   public Register src;
@@ -18,5 +20,17 @@ public class MoveInstruction extends Instruction
   public String toString()
   {
     return new String(name + " " + src + ", " + dest);
+  }
+  
+  public ArrayList<Register> getSources(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    ret.add(src);
+    return ret;
+  }
+  
+  public ArrayList<Register> getDests(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    ret.add(dest);
+    return ret;
   }
 }

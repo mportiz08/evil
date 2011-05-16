@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class StoreOutInstruction extends Instruction
 {
   public Register reg;
@@ -20,5 +22,17 @@ public class StoreOutInstruction extends Instruction
   public String toSparc()
   {
     return new String("mov " + this.reg.sparcName + ", " + sparcRegister.sparcName);
+  }
+  
+  public ArrayList<Register> getSources(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    ret.add(reg);
+    return ret;
+  }
+  
+  public ArrayList<Register> getDests(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    ret.add(sparcRegister);
+    return ret;
   }
 }
