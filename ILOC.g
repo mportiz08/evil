@@ -217,7 +217,7 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Str
           b.instructions.add(new ComparisonInstruction("comp", condition, $reg.r));
           continueblock.name = "L" + c + "cont";
           b.successors.add(thenblock);
-          thenblock.predecessors.add(thenblock);
+          thenblock.predecessors.add(b);
           if(elseLast == null){
              b.successors.add(continueblock);
              continueblock.predecessors.add(b);
