@@ -16,7 +16,7 @@ public class RegisterAllocator
     for(Block b : blocks)
     { 
       localInfo(b);
-      globalInfo(b);
+      while(globalInfo(b));
     }
     //globalInfo(b);
     //liveSet(b);
@@ -39,21 +39,23 @@ public class RegisterAllocator
      }
   }
   
-  private void globalInfo(Block b)
+  private boolean globalInfo(Block b)
   {
-    if(b.genkill)
+     if(b.genkill)
      {
-       b.createGlobalInfo();
+       boolean change = b.createGlobalInfo();
        System.out.println("GEN for " + b.name);
        System.out.println(b.gen);
        System.out.println("KILL for " + b.name);
        System.out.println(b.kill);
        b.genkill = false;
-       for(Block bs : b.successors)
+       for(Block bs : b.predecessors)
        {
-         localInfo(bs);
+         change = change || globalInfo(bs);
        }
-     } 
+       return change;
+     }
+    return false;
   }
   
   private void liveSet(Block b)

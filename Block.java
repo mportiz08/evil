@@ -95,8 +95,17 @@ public class Block
     }
   }
   
-  public void createGlobalInfo()
+  public boolean createGlobalInfo()
   {
+    TreeSet<Register> ret = new TreeSet<Register>(new RegisterComparator());
+    TreeSet<Register> liveoutm = new TreeSet<Register>(new RegisterComparator());
+    for(Block b : successors){
+      liveoutm = b.liveOut;
+      liveoutm.removeAll(b.kill);
+      liveoutm.addAll(b.gen);
+      ret.addAll(liveoutm);
+    }
     // TODO
+    return ret.addAll(liveOut);
   }
 }

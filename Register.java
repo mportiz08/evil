@@ -31,6 +31,6 @@ public class Register extends Operand
   }
   
   public boolean equals(Object o){
-    return sparcName.equals(((Register)o).sparcName);
+    return name.equals(((Register)o).name);
   }
 }
