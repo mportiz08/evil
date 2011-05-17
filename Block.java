@@ -41,6 +41,31 @@ public class Block
     }
   }
   
+  public void printTreeReverse(){
+    System.out.println(name + ":" + subTreeStringReverse() + "\n");
+    for(Block b : predecessors)
+    {
+      if(!b.visited){
+        b.visited = true;
+        b.printTreeReverse();
+      }
+    }
+  }
+  
+  private String subTreeStringReverse()
+  {
+    String str = "";
+    for(Block b : predecessors)
+    {
+      str += (b.name + ", ");
+    }
+    //System.out.println("finished subtree");
+    
+    return str;
+  }
+  
+  
+  
   public String getInstructions(boolean sparc)
   {
     String rstring = "";
@@ -100,12 +125,12 @@ public class Block
     TreeSet<Register> ret = new TreeSet<Register>(new RegisterComparator());
     TreeSet<Register> liveoutm = new TreeSet<Register>(new RegisterComparator());
     for(Block b : successors){
-      liveoutm = b.liveOut;
+      liveoutm = new TreeSet<Register>(new RegisterComparator());
+      liveoutm.addAll(b.liveOut);
       liveoutm.removeAll(b.kill);
       liveoutm.addAll(b.gen);
       ret.addAll(liveoutm);
     }
-    // TODO
-    return ret.addAll(liveOut);
+    return liveOut.addAll(ret);
   }
 }

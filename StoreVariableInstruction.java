@@ -4,16 +4,18 @@ public class StoreVariableInstruction extends Instruction
 {
   private String vname;
   private Register reg;
+  private Register sparcRegister;
   
-  public StoreVariableInstruction(String vname, Register reg)
+  public StoreVariableInstruction(String vname, Register reg, Register sparcRegister)
   {
     super("storeai");
     this.vname = vname;
     this.reg = reg;
+    this.sparcRegister = sparcRegister;
   }
   
   public String toSparc(){
-    return "nop";
+    return new String("mov " + reg.sparcName + ", " + sparcRegister.sparcName);
   }
   
   public String toString()

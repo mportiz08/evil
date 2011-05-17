@@ -168,7 +168,7 @@ assignment[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
    :  ^(ASSIGN rv=expression[regtable, b, exit, structtable, vartable] lv=lvalue[regtable, b, exit, structtable, vartable])
         {
            if(lv.offset == null){
-             b.instructions.add(new StoreVariableInstruction($lv.r.name, $rv.r)); 
+             b.instructions.add(new StoreVariableInstruction($lv.r.name, $rv.r, $regtable.get($lv.r.name))); 
              //b.instructions.add(new MoveInstruction($rv.r, $lv.r));
            }
            else{
@@ -431,11 +431,21 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
       )
    |  rid=id
    {
-     Register temp = regtable.get($rid.rstring);
+     /*Register temp = regtable.get($rid.rstring);
      if(temp.global) {
        b.instructions.add(new LoadGlobalInstruction(temp.name, $r));
      } else {
        b.instructions.add(new LoadVariableInstruction(temp.name, $r));
+     }
+     if(vartable.get($rid.rstring).isStruct()){
+       $structfields = ((StructType)vartable.get($rid.rstring)).types;
+     }*/
+
+     $r = regtable.get($rid.rstring);
+     if($r.global) {
+       b.instructions.add(new LoadGlobalInstruction($r.name, $r));
+     } else {
+       b.instructions.add(new LoadVariableInstruction($r.name, $r));
      }
      if(vartable.get($rid.rstring).isStruct()){
        $structfields = ((StructType)vartable.get($rid.rstring)).types;

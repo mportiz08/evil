@@ -1,0 +1,29 @@
+fun main() void
+{
+   int o, a, b, c, d;
+   o = 2;
+   a = o;
+   b = 3;
+   c = 2 + 3;
+
+   if(c == 5){
+     b = 2 + b;
+     o = b + c;
+     d = o + b;
+     if(d == 5){
+       d = o;
+     }
+     else{
+       d = a;
+     }
+     d = b + a;
+     b = a + o;
+   }
+   else{
+     o = a + b;
+     a = o + b;
+     d = o + a;
+   }
+   a = b + d;
+   print a;
+}

@@ -13,10 +13,10 @@ public class RegisterAllocator
   
   public void color()
   {
-    for(Block b : blocks)
+    for(FuncBlock b : blocks)
     { 
       localInfo(b);
-      while(globalInfo(b));
+      while(globalInfo(b.exit,b.genkill));
     }
     //globalInfo(b);
     //liveSet(b);
@@ -27,10 +27,10 @@ public class RegisterAllocator
      if(!b.genkill)
      {
        b.createLocalInfo();
-       System.out.println("GEN for " + b.name);
+       /*System.out.println("GEN for " + b.name);
        System.out.println(b.gen);
        System.out.println("KILL for " + b.name);
-       System.out.println(b.kill);
+       System.out.println(b.kill);*/
        b.genkill = true;
        for(Block bs : b.successors)
        {
@@ -39,23 +39,33 @@ public class RegisterAllocator
      }
   }
   
-  private boolean globalInfo(Block b)
+  private boolean globalInfo(Block b, boolean doworkson)
   {
-     if(b.genkill)
+     /*if(b.genkill == doworkson)
      {
        boolean change = b.createGlobalInfo();
-       System.out.println("GEN for " + b.name);
-       System.out.println(b.gen);
-       System.out.println("KILL for " + b.name);
-       System.out.println(b.kill);
-       b.genkill = false;
+       System.out.println("Liveout for " + b.name);
+       System.out.println(b.liveOut);
+       b.genkill = !doworkson;
        for(Block bs : b.predecessors)
        {
-         change = change || globalInfo(bs);
+         change = change || globalInfo(bs, doworkson);
        }
        return change;
      }
-    return false;
+     return false;*/
+    
+    boolean change = b.createGlobalInfo();
+    System.out.println("Liveout for " + b.name);
+    System.out.println(b.liveOut);
+    for(Block bs : b.predecessors)
+    {
+      if(bs.genkill == doworkson){
+        bs.genkill = !doworkson;
+        change = change || globalInfo(bs, doworkson);
+      }
+    }
+    return change;
   }
   
   private void liveSet(Block b)
