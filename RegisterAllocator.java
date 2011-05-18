@@ -19,6 +19,12 @@ public class RegisterAllocator
       localInfo(b);
       while(globalInfo(b.exit,b.genkill));
       InterferenceGraph ig = new InterferenceGraph();
+      populateNodes(b, b.genkill, ig);
+      // debug
+      System.out.println("Graph Nodes ~~> " + b.name);
+      for(Node n : ig.nodes)
+        System.out.println(n.reg.sparcName);
+      
       interGraph(b, b.genkill, ig);
       colorGraph(b, ig);
     }
@@ -70,6 +76,18 @@ public class RegisterAllocator
       }
     }
     return change;
+  }
+  
+  private void populateNodes(Block b, boolean genkill, InterferenceGraph ig)
+  {
+    b.addAllNodes(ig);
+    for(Block bs : b.successors)
+    {
+      if(bs.genkill == genkill) {
+        bs.genkill = !genkill;
+        populateNodes(bs, genkill, ig);
+      }
+    }
   }
   
   private void interGraph(Block b, boolean genkill, InterferenceGraph ig)
