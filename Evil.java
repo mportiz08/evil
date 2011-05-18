@@ -136,13 +136,13 @@ public class Evil
         System.out.println();
         System.out.println(".section\t\".rodata\"");
         System.out.println(".align 8");
-        System.out.println(".LLC0");
+        System.out.println(".LLC0:");
         System.out.println(".asciz\t\"%d \"");
         System.out.println(".align 8");
-        System.out.println(".LCC1");
+        System.out.println(".LCC1:");
         System.out.println(".asciz\t\"%d\\n\"");
         System.out.println(".align 8");
-        System.out.println(".LCC2");
+        System.out.println(".LCC2:");
         System.out.println(".asciz\t\"%d\"");
       }
       //RegisterAllocator ra = new RegisterAllocator(blist);
