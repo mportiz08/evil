@@ -21,16 +21,16 @@ public class RegisterAllocator
       InterferenceGraph ig = new InterferenceGraph();
       populateNodes(b, b.genkill, ig);
       // debug
-      System.out.println("Graph Nodes ~~> " + b.name);
+      /*System.out.println("Graph Nodes ~~> " + b.name);
       for(Node n : ig.nodes)
-        System.out.println(n.reg.sparcName);
+        System.out.println(n.reg.sparcName);*/
       
       interGraph(b, b.genkill, ig);
       colorGraph(b, ig);
       // debug
-      System.out.println("Graph Nodes (colored) ~~> " + b.name);
+      /*System.out.println("Graph Nodes (colored) ~~> " + b.name);
       for(Node n : ig.nodes)
-        System.out.println(n.reg.sparcName);
+        System.out.println(n.reg.sparcName);*/
     }
     //globalInfo(b);
     //liveSet(b);
@@ -70,8 +70,8 @@ public class RegisterAllocator
      return false;*/
     
     boolean change = b.createGlobalInfo();
-    System.out.println("Liveout for " + b.name);
-    System.out.println(b.liveOut);
+    /*System.out.println("Liveout for " + b.name);
+    System.out.println(b.liveOut);*/
     for(Block bs : b.predecessors)
     {
       if(bs.genkill == doworkson){

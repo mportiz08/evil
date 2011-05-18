@@ -53,6 +53,8 @@ public class Evil
 
          ILOC iloc = new ILOC(nodes);
          iloc.generate(blist,structtable,vartable);
+         RegisterAllocator ra = new RegisterAllocator(blist);
+         ra.color();
       }
       catch (org.antlr.runtime.RecognitionException e)
       {
@@ -143,8 +145,8 @@ public class Evil
         System.out.println(".LCC2");
         System.out.println(".asciz\t\"%d\"");
       }
-      RegisterAllocator ra = new RegisterAllocator(blist);
-      ra.color();
+      //RegisterAllocator ra = new RegisterAllocator(blist);
+      //ra.color();
    }
 
    private static final String DISPLAYAST = "-displayAST";
