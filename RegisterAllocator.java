@@ -3,13 +3,13 @@ import java.util.*;
 public class RegisterAllocator
 {
   private ArrayList<FuncBlock> blocks;
-  //private TreeSet<Register> liveOut;
+  private ArrayList<String> colors;
   
   
   public RegisterAllocator(ArrayList<FuncBlock> blocks)
   {
     this.blocks = blocks;
-    //this.liveOut = new TreeSet<Register>(new RegisterComparator());
+    this.colors = createColors();
   }
   
   public void color()
@@ -114,6 +114,32 @@ public class RegisterAllocator
       nstack.push(selected);
     }
     // reconstruct graph
-    
+    while(!nstack.isEmpty())
+    {
+      Node selected = nstack.pop();
+      ig.addAndColorNode(selected, colors);
+    }
+  }
+  
+  private ArrayList<String> createColors()
+  {
+    ArrayList<String> colors = new ArrayList<String>();
+    for(int i = 0; i < 8; i++)
+    {
+      colors.add(new String("%l" + i));
+    }
+    for(int i = 0; i < 6; i++)
+    {
+      colors.add(new String("%i" + i));
+    }
+    for(int i = 0; i < 8; i++)
+    {
+      colors.add(new String("%g" + i));
+    }
+    for(int i = 0; i < 6; i++)
+    {
+      colors.add(new String("%o" + i));
+    }
+    return colors;
   }
 }

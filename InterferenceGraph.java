@@ -26,4 +26,28 @@ public class InterferenceGraph
     System.out.println("couldn't find " + r + " yo");
     return null;
   }
+  
+  public void addAndColorNode(Node n, ArrayList<String> colors)
+  {
+    // add edge to nodes in graph currently
+    ArrayList<Node> neighbors = nodes;
+    for(Node other : neighbors)
+    {
+      n.addEdgeTo(other);
+    }
+    
+    // color node based on its neighbors
+    ArrayList<String> neighborColors = new ArrayList<String>();
+    for(Node other : neighbors)
+    {
+      neighborColors.add(other.reg.sparcName);
+    }
+    ArrayList<String> availableColors = colors;
+    availableColors.removeAll(neighborColors);
+    String color = availableColors.get(0); // will have to change for spill later (ie if array is empty)
+    n.reg.sparcName = color;
+    
+    // add colored node to graph
+    nodes.add(n);
+  }
 }
