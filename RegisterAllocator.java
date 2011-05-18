@@ -27,6 +27,10 @@ public class RegisterAllocator
       
       interGraph(b, b.genkill, ig);
       colorGraph(b, ig);
+      // debug
+      System.out.println("Graph Nodes (colored) ~~> " + b.name);
+      for(Node n : ig.nodes)
+        System.out.println(n.reg.sparcName);
     }
     //globalInfo(b);
     //liveSet(b);

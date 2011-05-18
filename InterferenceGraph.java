@@ -29,20 +29,13 @@ public class InterferenceGraph
   
   public void addAndColorNode(Node n, ArrayList<String> colors)
   {
-    // add edge to nodes in graph currently
-    ArrayList<Node> neighbors = nodes;
-    for(Node other : neighbors)
-    {
-      n.addEdgeTo(other);
-    }
-    
     // color node based on its neighbors
     ArrayList<String> neighborColors = new ArrayList<String>();
-    for(Node other : neighbors)
+    for(Node other : n.edges)
     {
       neighborColors.add(other.reg.sparcName);
     }
-    ArrayList<String> availableColors = colors;
+    ArrayList<String> availableColors = new ArrayList<String>(colors);
     availableColors.removeAll(neighborColors);
     String color = availableColors.get(0); // will have to change for spill later (ie if array is empty)
     n.reg.sparcName = color;
