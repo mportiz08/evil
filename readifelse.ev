@@ -1,0 +1,13 @@
+fun main() int
+{
+  int a;
+  a = 5;
+  read a;
+  if(a < 0){
+    print 0;
+  }
+  else{
+    print a;
+  }
+  return a;
+}

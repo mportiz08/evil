@@ -14,7 +14,15 @@ public class MoveConditionInstruction extends Instruction
   
   public String toSparc()
   {
-    return new String(name + " " + immediate + ", " + dest.sparcName);
+    String tempname = new String(name);
+    if(name.equals("movlt")){
+      tempname = "movl";
+    }
+    else if(name.equals("movgt")){
+      tempname = "movg";
+    }
+    //have to move immediate into a register!!
+    return new String(tempname + " " + immediate + ", " + dest.sparcName);
   }
   
   public String toString()

@@ -19,7 +19,11 @@ public class ComparisonInstruction extends Instruction
   
   public String toSparc()
   {
-    return new String(name + " " + src1.sparcName + ", " + src2.sparcName);
+    String tempname = new String(name);
+    if(name.equals("comp")){
+      tempname = "cmp";
+    }
+    return new String(tempname + " " + src1.sparcName + ", " + src2.sparcName);
   }
   
   public ArrayList<Register> getSources(){
