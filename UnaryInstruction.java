@@ -19,13 +19,13 @@ public class UnaryInstruction extends Instruction
       return new String("mov " + reg.sparcName + ", " + sparcRegister.sparcName + "\n  call free\n  nop");
     } else if(name.equals("print")) {
       sparcRegister.sparcName = "%o0";
-      return new String("mov " + reg.sparcName + ", %o1\n  sethi %hi(.LCC0), " + sparcRegister.sparcName + "\n  or " + sparcRegister.sparcName + ", %lo(.LCC0), " + sparcRegister.sparcName + "\n  call printf\n  nop");
+      return new String("mov " + reg.sparcName + ", %o1\n  sethi %hi(.LLC0), " + sparcRegister.sparcName + "\n  or " + sparcRegister.sparcName + ", %lo(.LLC0), " + sparcRegister.sparcName + "\n  call printf\n  nop");
     } else if(name.equals("println")) {
       sparcRegister.sparcName = "%o0";
-      return new String("mov " + reg.sparcName + ", %o1\n  sethi %hi(.LCC1), " + sparcRegister.sparcName + "\n  or " + sparcRegister.sparcName + ", %lo(.LCC1), " + sparcRegister.sparcName + "\n  call printf\n  nop");
+      return new String("mov " + reg.sparcName + ", %o1\n  sethi %hi(.LLC1), " + sparcRegister.sparcName + "\n  or " + sparcRegister.sparcName + ", %lo(.LLC1), " + sparcRegister.sparcName + "\n  call printf\n  nop");
     } else if(name.equals("read")) {
       sparcRegister.sparcName = "%o0";
-      return new String("sethi %hi(.LCC2), " + sparcRegister.sparcName + "\n  or " + sparcRegister.sparcName + ", %lo(.LCC2), " + sparcRegister.sparcName + "\n  call scanf\n  nop\n  ldsw [%fp-20], %o1");
+      return new String("sethi %hi(.LLC2), " + sparcRegister.sparcName + "\n  or " + sparcRegister.sparcName + ", %lo(.LLC2), " + sparcRegister.sparcName + "\n  call scanf\n  nop\n  ldsw [%fp-20], %o1");
     }
     return "";
   }

@@ -16,3 +16,4 @@ antlr-3.3-complete.jar
 *.il
 Mochi/
 *.s
+*.out
