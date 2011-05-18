@@ -10,7 +10,6 @@ public class Block
   public TreeSet<Register> gen;
   public TreeSet<Register> kill;
   public TreeSet<Register> liveOut;
-  public TreeSet<Register> liveSet;
   
   public String name;
   
@@ -29,7 +28,6 @@ public class Block
     gen = new TreeSet<Register>(rc);
     kill = new TreeSet<Register>(rc);
     liveOut = new TreeSet<Register>(rc);
-    liveSet = new TreeSet<Register>(rc);
   }
   
   public void printTree(){
@@ -145,16 +143,21 @@ public class Block
       ig.addNode(new Node(r));
     }
     
+    // compute live set and interference graph
     for(int i = instructions.size() - 1; i >= 0; i--)
     {
       for(Register dest : instructions.get(i).getDests())
       {
-        liveSet.remove(dest);
+        liveOut.remove(dest);
         Node destnode = ig.nodeForRegister(dest);
-        for(Register r : liveSet)
+        for(Register r : liveOut)
         {
           destnode.addEdgeTo(ig.nodeForRegister(r));
         }
+      }
+      for(Register src : instructions.get(i).getSources())
+      {
+        liveOut.add(src);
       }
     }
   }

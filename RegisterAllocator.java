@@ -3,13 +3,13 @@ import java.util.*;
 public class RegisterAllocator
 {
   private ArrayList<FuncBlock> blocks;
-  private TreeSet<Register> liveOut;
+  //private TreeSet<Register> liveOut;
   
   
   public RegisterAllocator(ArrayList<FuncBlock> blocks)
   {
     this.blocks = blocks;
-    this.liveOut = new TreeSet<Register>(new RegisterComparator());
+    //this.liveOut = new TreeSet<Register>(new RegisterComparator());
   }
   
   public void color()
@@ -19,7 +19,7 @@ public class RegisterAllocator
       localInfo(b);
       while(globalInfo(b.exit,b.genkill));
       InterferenceGraph ig = new InterferenceGraph();
-      liveSet(b, b.genkill, ig);
+      interGraph(b, b.genkill, ig);
     }
     //globalInfo(b);
     //liveSet(b);
@@ -71,14 +71,14 @@ public class RegisterAllocator
     return change;
   }
   
-  private void liveSet(Block b, boolean genkill, InterferenceGraph ig)
+  private void interGraph(Block b, boolean genkill, InterferenceGraph ig)
   {
     b.createLiveSet(ig);
     for(Block bs : b.successors)
     {
       if(bs.genkill == genkill) {
         bs.genkill = !genkill;
-        liveSet(bs, genkill, ig);
+        interGraph(bs, genkill, ig);
       }
     }
   }
