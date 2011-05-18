@@ -14,6 +14,20 @@ public class StoreVariableInstruction extends Instruction
     this.sparcRegister = sparcRegister;
   }
   
+  public ArrayList<Register> getSources()
+  {
+    ArrayList<Register> sources = new ArrayList<Register>();
+    sources.add(reg);
+    return sources;
+  }
+  
+  public ArrayList<Register> getDests()
+  {
+    ArrayList<Register> sources = new ArrayList<Register>();
+    sources.add(sparcRegister);
+    return sources;
+  }
+  
   public String toSparc(){
     return new String("mov " + reg.sparcName + ", " + sparcRegister.sparcName);
   }

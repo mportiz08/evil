@@ -108,6 +108,8 @@ public class Block
     {
       for(Register src : i.getSources())
       {
+        /*if(src == null)
+          System.out.println(i.toSparc() + " messed up");*/
         if(!kill.contains(src))
         {
           gen.add(src);
@@ -115,6 +117,8 @@ public class Block
       }
       for(Register dest : i.getDests())
       {
+        /*if(dest == null)
+          System.out.println(i.toSparc() + " messed up");*/
         kill.add(dest);
       }
     }

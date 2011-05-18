@@ -37,7 +37,10 @@ public class RetInstruction extends Instruction
   
   public ArrayList<Register> getSources(){
     ArrayList<Register> ret = new ArrayList<Register>();
-    ret.add(reg);
+    if(reg != null)
+    {
+      ret.add(reg);
+    }
     return ret;
   }
 }
