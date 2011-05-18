@@ -134,7 +134,7 @@ public class Block
     return liveOut.addAll(ret);
   }
   
-  public void createLiveSet(InterferenceGraph ig)
+  public void createInterGraph(InterferenceGraph ig)
   {
     // create nodes
     TreeSet<Register> allregs = getAllRegs();
@@ -142,6 +142,10 @@ public class Block
     {
       ig.addNode(new Node(r));
     }
+    // debug
+    System.out.println("Graph Nodes ~~> " + name);
+    for(Node n : ig.nodes)
+      System.out.println(n.reg.sparcName);
     
     // compute live set and interference graph
     for(int i = instructions.size() - 1; i >= 0; i--)
@@ -170,6 +174,7 @@ public class Block
       allregs.addAll(i.getSources());
       allregs.addAll(i.getDests());
     }
+    allregs.addAll(liveOut);
     return allregs;
   }
 }

@@ -20,6 +20,7 @@ public class RegisterAllocator
       while(globalInfo(b.exit,b.genkill));
       InterferenceGraph ig = new InterferenceGraph();
       interGraph(b, b.genkill, ig);
+      colorGraph(b, ig);
     }
     //globalInfo(b);
     //liveSet(b);
@@ -73,7 +74,7 @@ public class RegisterAllocator
   
   private void interGraph(Block b, boolean genkill, InterferenceGraph ig)
   {
-    b.createLiveSet(ig);
+    b.createInterGraph(ig);
     for(Block bs : b.successors)
     {
       if(bs.genkill == genkill) {
@@ -83,8 +84,18 @@ public class RegisterAllocator
     }
   }
   
-  private void colorGraph(Block b)
+  private void colorGraph(Block b, InterferenceGraph ig)
   {
-  
+    Stack<Node> nstack = new Stack<Node>();
+    // destruct graph
+    while(!ig.nodes.isEmpty())
+    {
+      Node selected = ig.nodes.get(0);
+      selected.removeEdges();
+      ig.nodes.remove(selected);
+      nstack.push(selected);
+    }
+    // reconstruct graph
+    
   }
 }

@@ -2,7 +2,7 @@ import java.util.*;
 
 public class InterferenceGraph
 {
-  private ArrayList<Node> nodes;
+  public ArrayList<Node> nodes;
   
   public InterferenceGraph()
   {
@@ -18,11 +18,12 @@ public class InterferenceGraph
   {
     for(Node n : nodes)
     {
-      if(n.reg.equals(r))
+      if(n.reg.sparcEquals(r))
       {
         return n;
       }
     }
+    System.out.println("couldn't find " + r + " yo");
     return null;
   }
 }
