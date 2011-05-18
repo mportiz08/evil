@@ -5,6 +5,7 @@ public class RegisterAllocator
   private ArrayList<FuncBlock> blocks;
   private TreeSet<Register> liveOut;
   
+  
   public RegisterAllocator(ArrayList<FuncBlock> blocks)
   {
     this.blocks = blocks;
@@ -17,6 +18,8 @@ public class RegisterAllocator
     { 
       localInfo(b);
       while(globalInfo(b.exit,b.genkill));
+      InterferenceGraph ig = new InterferenceGraph();
+      liveSet(b, b.genkill, ig);
     }
     //globalInfo(b);
     //liveSet(b);
@@ -68,9 +71,16 @@ public class RegisterAllocator
     return change;
   }
   
-  private void liveSet(Block b)
+  private void liveSet(Block b, boolean genkill, InterferenceGraph ig)
   {
-  
+    b.createLiveSet(ig);
+    for(Block bs : b.successors)
+    {
+      if(bs.genkill == genkill) {
+        bs.genkill = !genkill;
+        liveSet(bs, genkill, ig);
+      }
+    }
   }
   
   private void colorGraph(Block b)

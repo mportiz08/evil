@@ -10,6 +10,7 @@ public class Block
   public TreeSet<Register> gen;
   public TreeSet<Register> kill;
   public TreeSet<Register> liveOut;
+  public TreeSet<Register> liveSet;
   
   public String name;
   
@@ -28,6 +29,7 @@ public class Block
     gen = new TreeSet<Register>(rc);
     kill = new TreeSet<Register>(rc);
     liveOut = new TreeSet<Register>(rc);
+    liveSet = new TreeSet<Register>(rc);
   }
   
   public void printTree(){
@@ -132,5 +134,39 @@ public class Block
       ret.addAll(liveoutm);
     }
     return liveOut.addAll(ret);
+  }
+  
+  public void createLiveSet(InterferenceGraph ig)
+  {
+    // create nodes
+    TreeSet<Register> allregs = getAllRegs();
+    for(Register r : allregs)
+    {
+      ig.addNode(new Node(r));
+    }
+    
+    for(int i = instructions.size() - 1; i >= 0; i--)
+    {
+      for(Register dest : instructions.get(i).getDests())
+      {
+        liveSet.remove(dest);
+        Node destnode = ig.nodeForRegister(dest);
+        for(Register r : liveSet)
+        {
+          destnode.addEdgeTo(ig.nodeForRegister(r));
+        }
+      }
+    }
+  }
+  
+  private TreeSet<Register> getAllRegs()
+  {
+    TreeSet<Register> allregs = new TreeSet<Register>(new RegisterComparator());
+    for(Instruction i : instructions)
+    {
+      allregs.addAll(i.getSources());
+      allregs.addAll(i.getDests());
+    }
+    return allregs;
   }
 }
