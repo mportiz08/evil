@@ -25,7 +25,7 @@ public class UnaryInstruction extends Instruction
       return new String("mov " + reg.sparcName + ", %o1\n  sethi %hi(.LLC1), " + sparcRegister.sparcName + "\n  or " + sparcRegister.sparcName + ", %lo(.LLC1), " + sparcRegister.sparcName + "\n  call printf\n  nop");
     } else if(name.equals("read")) {
       sparcRegister.sparcName = "%o0";
-      return new String("sethi %hi(.LLC2), " + sparcRegister.sparcName + "\n  or " + sparcRegister.sparcName + ", %lo(.LLC2), " + sparcRegister.sparcName + "\n  call scanf\n  nop\n  ldsw [%fp-20], %o1");
+      return new String("sethi %hi(.LLC2), " + sparcRegister.sparcName + "\n  or " + sparcRegister.sparcName + ", %lo(.LLC2), " + sparcRegister.sparcName + "\n  call scanf\n  nop\n  mov %o1, " + reg.sparcName);
     }
     return "";
   }

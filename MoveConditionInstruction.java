@@ -4,12 +4,14 @@ public class MoveConditionInstruction extends Instruction
 {
   public String immediate;
   public Register dest;
+  public Register sparcRegister;
   
   public MoveConditionInstruction(String name, String immediate, Register dest)
   {
     super(name);
     this.immediate = immediate;
     this.dest = dest;
+    this.sparcRegister = new Register();
   }
   
   public String toSparc()
@@ -22,7 +24,7 @@ public class MoveConditionInstruction extends Instruction
       tempname = "movg";
     }
     //have to move immediate into a register!!
-    return new String(tempname + " " + immediate + ", " + dest.sparcName);
+    return new String("set "+ immediate + ", " + sparcRegister.sparcName + "\n  " + tempname + " %icc, " + sparcRegister.sparcName + ", " + dest.sparcName);
   }
   
   public String toString()
@@ -30,9 +32,16 @@ public class MoveConditionInstruction extends Instruction
     return new String(name + " " + immediate + ", " + dest);
   }
   
+  public ArrayList<Register> getSources(){
+    ArrayList<Register> ret = new ArrayList<Register>();
+    ret.add(sparcRegister);
+    return ret;
+  }
+  
   public ArrayList<Register> getDests(){
     ArrayList<Register> ret = new ArrayList<Register>();
     ret.add(dest);
+    ret.add(sparcRegister);
     return ret;
   }
 }

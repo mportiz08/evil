@@ -12,7 +12,7 @@ public class JumpInstruction extends Instruction
   
   public String toSparc()
   {
-    return new String("ba " + lbl);
+    return new String("ba " + lbl + "\n  nop");
   }
   
   public String toString()
