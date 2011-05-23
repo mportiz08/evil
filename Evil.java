@@ -144,6 +144,8 @@ public class Evil
         System.out.println(".align 8");
         System.out.println(".LLC2:");
         System.out.println(".asciz\t\"%d\"");
+        System.out.println();
+        System.out.println(".common\t_read, 4, 4");
       }
       //RegisterAllocator ra = new RegisterAllocator(blist);
       //ra.color();
