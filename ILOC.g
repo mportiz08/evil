@@ -413,8 +413,20 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
    | ^(MINUS lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("sub", $lv.r, $rv.r, $r));})
    | ^(TIMES lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable]  {b.instructions.add(new ArithmeticInstruction("mult", $lv.r, $rv.r, $r));})
    | ^(DIVIDE lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("div", $lv.r, $rv.r, $r));})
-   | ^(NOT uv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("xori", $uv.r, new Register(), $r));/*xori r, true, dest*/})
-   | ^(NEG uv=expression[regtable, b, exit, structtable, vartable]  {b.instructions.add(new ArithmeticInstruction("mult", $uv.r, new Register(), $r));/*multi r, -1, dest*/})
+   | ^(NOT uv=expression[regtable, b, exit, structtable, vartable]
+        {
+          /*Register temp = new Register();
+          b.instructions.add(new LoadInstruction("loadi", "1", temp));
+          b.instructions.add(new ArithmeticInstruction("xor", $uv.r, new Register(), $r));*/
+        }
+      )
+   | ^(NEG uv=expression[regtable, b, exit, structtable, vartable]
+        {
+          b.instructions.add(new LoadInstruction("loadi", "0", $r));
+          //b.instructions.add(new ArithmeticInstruction("mult", $uv.r, new Register(), $r));
+          b.instructions.add(new ArithmeticInstruction("sub", $r, $uv.r, $r));
+        }
+       )
    | ^(DOT reg=expression[regtable, b, exit, structtable, vartable] rid=id
         {
           int offset = 0;

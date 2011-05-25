@@ -43,8 +43,8 @@ public class ArithmeticInstruction extends Instruction
     ArrayList<Register> ret = new ArrayList<Register>();
     ret.add(src1);
     ret.add(src2);
-    ret.add(sparcRegister);
-    ret.add(sparcRegister2);
+    //ret.add(sparcRegister);
+    //ret.add(sparcRegister2);
     return ret;
   }
   
@@ -52,8 +52,8 @@ public class ArithmeticInstruction extends Instruction
     ArrayList<Register> ret = new ArrayList<Register>();
     ret.add(dest);
     if(name.equals("mult") || name.equals("div")){
-       ret.add(sparcRegister);//notsure
-       ret.add(sparcRegister2);//notsure
+       //ret.add(sparcRegister);//notsure
+       //ret.add(sparcRegister2);//notsure
     }
     return ret;
   }
