@@ -53,8 +53,6 @@ public class Evil
 
          ILOC iloc = new ILOC(nodes);
          iloc.generate(blist,structtable,vartable);
-         RegisterAllocator ra = new RegisterAllocator(blist);
-         ra.color();
       }
       catch (org.antlr.runtime.RecognitionException e)
       {
@@ -106,6 +104,8 @@ public class Evil
       }
       else 
       {
+        RegisterAllocator ra = new RegisterAllocator(blist);
+        ra.color();
         System.out.println(".section\t\".text\"");
         System.out.println(".align 4");
         for(String s : vartable.keySet())

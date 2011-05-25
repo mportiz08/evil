@@ -122,6 +122,9 @@ public class Block
         kill.add(dest);
       }
     }
+    System.out.println(name);
+    System.out.println("gen: " + gen);
+    System.out.println("kill: " + kill);
   }
   
   public boolean createGlobalInfo()
@@ -150,6 +153,7 @@ public class Block
   
   public void createInterGraph(InterferenceGraph ig)
   {
+    System.out.println("creating graph for " + name);
     // compute live set and interference graph
     for(int i = instructions.size() - 1; i >= 0; i--)
     {
@@ -157,6 +161,7 @@ public class Block
       {
         liveOut.remove(dest);
         Node destnode = ig.nodeForRegister(dest);
+        System.out.println("Register " + dest + " conflicts with " + liveOut);
         for(Register r : liveOut)
         {
           destnode.addEdgeTo(ig.nodeForRegister(r));

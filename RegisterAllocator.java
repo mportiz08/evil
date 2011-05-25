@@ -17,6 +17,7 @@ public class RegisterAllocator
     for(FuncBlock b : blocks)
     { 
       localInfo(b);
+      
       while(globalInfo(b.exit,b.genkill));
       InterferenceGraph ig = new InterferenceGraph();
       populateNodes(b, b.genkill, ig);
@@ -26,6 +27,14 @@ public class RegisterAllocator
         System.out.println(n.reg.sparcName);*/
       
       interGraph(b, b.genkill, ig);
+      for(Node n : ig.nodes) {
+        System.out.println(n.reg.sparcName);
+        System.out.print("\t");
+        for(Node edge : n.edges) {
+          System.out.print(edge.reg.sparcName);
+        }
+        System.out.println();
+      }
       colorGraph(b, ig);
       // debug
       /*System.out.println("Graph Nodes (colored) ~~> " + b.name);
@@ -68,14 +77,14 @@ public class RegisterAllocator
        return change;
      }
      return false;*/
-    
+    b.genkill = !doworkson;
     boolean change = b.createGlobalInfo();
     /*System.out.println("Liveout for " + b.name);
     System.out.println(b.liveOut);*/
     for(Block bs : b.predecessors)
     {
       if(bs.genkill == doworkson){
-        bs.genkill = !doworkson;
+        //bs.genkill = !doworkson;
         change = change || globalInfo(bs, doworkson);
       }
     }
@@ -84,11 +93,12 @@ public class RegisterAllocator
   
   private void populateNodes(Block b, boolean genkill, InterferenceGraph ig)
   {
+    b.genkill = !genkill;
     b.addAllNodes(ig);
     for(Block bs : b.successors)
     {
       if(bs.genkill == genkill) {
-        bs.genkill = !genkill;
+        //bs.genkill = !genkill;
         populateNodes(bs, genkill, ig);
       }
     }
@@ -96,11 +106,11 @@ public class RegisterAllocator
   
   private void interGraph(Block b, boolean genkill, InterferenceGraph ig)
   {
+    b.genkill = !genkill;
     b.createInterGraph(ig);
     for(Block bs : b.successors)
     {
       if(bs.genkill == genkill) {
-        bs.genkill = !genkill;
         interGraph(bs, genkill, ig);
       }
     }
