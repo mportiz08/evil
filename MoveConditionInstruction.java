@@ -21,6 +21,9 @@ public class MoveConditionInstruction extends Instruction
     else if(name.equals("movgt")){
       tempname = "movg";
     }
+    else if(name.equals("moveq")){
+      tempname = "move";
+    }
     //have to move immediate into a register!!
     return new String(tempname + " %icc, " + immediate + ", " + dest.sparcName);
   }
