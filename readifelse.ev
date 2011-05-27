@@ -1,15 +1,18 @@
-fun addone(int i) int
+int a;
+
+fun addone(int i) void
 {
-  return i + 1;
+  a = i + 1;
+  return;
 }
 
 fun main() int
 {
-  int a, b;
+  int b;
   a = 0;
   b = 9;
   while((a < b) || (a > b)) {
-    a = addone(a);
+    addone(a);
     if(a == b){
        print 1000;
     } 
