@@ -415,9 +415,8 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
    | ^(DIVIDE lv=expression[regtable, b, exit, structtable, vartable] rv=expression[regtable, b, exit, structtable, vartable] {b.instructions.add(new ArithmeticInstruction("div", $lv.r, $rv.r, $r));})
    | ^(NOT uv=expression[regtable, b, exit, structtable, vartable]
         {
-          /*Register temp = new Register();
-          b.instructions.add(new LoadInstruction("loadi", "1", temp));
-          b.instructions.add(new ArithmeticInstruction("xor", $uv.r, new Register(), $r));*/
+          b.instructions.add(new LoadInstruction("loadi", "1", $r));
+          b.instructions.add(new ArithmeticInstruction("xor", $uv.r, $r, $r));
         }
       )
    | ^(NEG uv=expression[regtable, b, exit, structtable, vartable]
