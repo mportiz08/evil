@@ -122,9 +122,9 @@ public class Block
         kill.add(dest);
       }
     }
-    System.out.println(name);
-    System.out.println("gen: " + gen);
-    System.out.println("kill: " + kill);
+    //System.out.println(name);
+    //System.out.println("gen: " + gen);
+    //System.out.println("kill: " + kill);
   }
   
   public boolean createGlobalInfo()
@@ -153,7 +153,7 @@ public class Block
   
   public void createInterGraph(InterferenceGraph ig)
   {
-    System.out.println("creating graph for " + name);
+    //System.out.println("creating graph for " + name);
     // compute live set and interference graph
     for(int i = instructions.size() - 1; i >= 0; i--)
     {
@@ -161,7 +161,7 @@ public class Block
       {
         liveOut.remove(dest);
         Node destnode = ig.nodeForRegister(dest);
-        System.out.println("Register " + dest + " conflicts with " + liveOut + "in " + instructions.get(i));
+        //System.out.println("Register " + dest + " conflicts with " + liveOut + "in " + instructions.get(i));
         for(Register r : liveOut)
         {
           destnode.addEdgeTo(ig.nodeForRegister(r));
@@ -179,7 +179,7 @@ public class Block
     TreeSet<Register> allregs = new TreeSet<Register>(new RegisterComparator());
     for(Instruction i : instructions)
     {
-      System.out.println("sdadsd " + i.toSparc() + " ASDASDASD");
+      //System.out.println("sdadsd " + i.toSparc() + " ASDASDASD");
       allregs.addAll(i.getSources());
       allregs.addAll(i.getDests());
     }

@@ -22,21 +22,21 @@ public class RegisterAllocator
       
       while(globalInfo(blist));
       InterferenceGraph ig = new InterferenceGraph();
-      populateNodes(b, b.genkill, ig);
+      populateNodes(blist, ig);
       // debug
       /*System.out.println("Graph Nodes ~~> " + b.name);
       for(Node n : ig.nodes)
         System.out.println(n.reg.sparcName);*/
       
-      interGraph(b, b.genkill, ig);
-      for(Node n : ig.nodes) {
+      interGraph(blist, ig);
+      /*for(Node n : ig.nodes) {
         System.out.println(n.reg.sparcName);
         System.out.print("\t");
         for(Node edge : n.edges) {
           System.out.print(edge.reg.sparcName);
         }
         System.out.println();
-      }
+      }*/
       colorGraph(b, ig);
       // debug
       /*System.out.println("Graph Nodes (colored) ~~> " + b.name);
@@ -64,10 +64,10 @@ public class RegisterAllocator
   {
        for(Block b : blist){
          b.createLocalInfo();
-         System.out.println("GEN for " + b.name);
+         /*System.out.println("GEN for " + b.name);
          System.out.println(b.gen);
          System.out.println("KILL for " + b.name);
-         System.out.println(b.kill);
+         System.out.println(b.kill);*/
        }
   }
   
@@ -77,34 +77,25 @@ public class RegisterAllocator
     for(Block b : blist)
     {
       change = change || b.createGlobalInfo();
-      System.out.println("Liveout for " + b.name);
-      System.out.println(b.liveOut);
+      /*System.out.println("Liveout for " + b.name);
+      System.out.println(b.liveOut);*/
     }
     return change;
   }
   
-  private void populateNodes(Block b, boolean genkill, InterferenceGraph ig)
+  private void populateNodes(ArrayList<Block> blist, InterferenceGraph ig)
   {
-    b.genkill = !genkill;
-    b.addAllNodes(ig);
-    for(Block bs : b.successors)
+    for(Block b : blist)
     {
-      if(bs.genkill == genkill) {
-        //bs.genkill = !genkill;
-        populateNodes(bs, genkill, ig);
-      }
+       b.addAllNodes(ig);
     }
   }
   
-  private void interGraph(Block b, boolean genkill, InterferenceGraph ig)
+  private void interGraph(ArrayList<Block> blist, InterferenceGraph ig)
   {
-    b.genkill = !genkill;
-    b.createInterGraph(ig);
-    for(Block bs : b.successors)
+    for(Block b : blist)
     {
-      if(bs.genkill == genkill) {
-        interGraph(bs, genkill, ig);
-      }
+       b.createInterGraph(ig);
     }
   }
   
