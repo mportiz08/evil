@@ -16,9 +16,11 @@ public class RegisterAllocator
   {
     for(FuncBlock b : blocks)
     { 
-      localInfo(b);
+      ArrayList<Block> blist = new ArrayList<Block>();
+      makeList(blist, b);
+      localInfo(blist);
       
-      while(globalInfo(b.exit,b.genkill));
+      while(globalInfo(blist));
       InterferenceGraph ig = new InterferenceGraph();
       populateNodes(b, b.genkill, ig);
       // debug
@@ -45,48 +47,38 @@ public class RegisterAllocator
     //liveSet(b);
   }
   
-  private void localInfo(Block b)
+  private void makeList(ArrayList<Block> blist, Block b)
   {
      if(!b.genkill)
      {
-       b.createLocalInfo();
-       /*System.out.println("GEN for " + b.name);
-       System.out.println(b.gen);
-       System.out.println("KILL for " + b.name);
-       System.out.println(b.kill);*/
+       blist.add(b);
        b.genkill = true;
        for(Block bs : b.successors)
        {
-         localInfo(bs);
+         makeList(blist, bs);
        }
      }
   }
   
-  private boolean globalInfo(Block b, boolean doworkson)
+  private void localInfo(ArrayList<Block> blist)
   {
-     /*if(b.genkill == doworkson)
-     {
-       boolean change = b.createGlobalInfo();
-       System.out.println("Liveout for " + b.name);
-       System.out.println(b.liveOut);
-       b.genkill = !doworkson;
-       for(Block bs : b.predecessors)
-       {
-         change = change || globalInfo(bs, doworkson);
+       for(Block b : blist){
+         b.createLocalInfo();
+         System.out.println("GEN for " + b.name);
+         System.out.println(b.gen);
+         System.out.println("KILL for " + b.name);
+         System.out.println(b.kill);
        }
-       return change;
-     }
-     return false;*/
-    b.genkill = !doworkson;
-    boolean change = b.createGlobalInfo();
-    /*System.out.println("Liveout for " + b.name);
-    System.out.println(b.liveOut);*/
-    for(Block bs : b.predecessors)
+  }
+  
+  private boolean globalInfo(ArrayList<Block> blist)
+  {
+    boolean change = false;
+    for(Block b : blist)
     {
-      if(bs.genkill == doworkson){
-        //bs.genkill = !doworkson;
-        change = change || globalInfo(bs, doworkson);
-      }
+      change = change || b.createGlobalInfo();
+      System.out.println("Liveout for " + b.name);
+      System.out.println(b.liveOut);
     }
     return change;
   }

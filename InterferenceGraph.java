@@ -24,7 +24,10 @@ public class InterferenceGraph
       }
     }
     System.out.println("couldn't find " + r + " yo");
-    return null;
+    //return null;
+    Node n = new Node(r);
+    nodes.add(n);
+    return n;
   }
   
   public void addAndColorNode(Node n, ArrayList<String> colors)
