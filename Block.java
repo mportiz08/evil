@@ -147,6 +147,7 @@ public class Block
     TreeSet<Register> allregs = getAllRegs();
     for(Register r : allregs)
     {
+      if(!r.sparcName.contains("%"))
       ig.addNode(new Node(r));
     }
   }
