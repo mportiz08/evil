@@ -40,13 +40,18 @@ public class AddressInstruction extends Instruction
   
   public ArrayList<Register> getSources(){
     ArrayList<Register> ret = new ArrayList<Register>();
+    if(name.equals("storeai")) {
+      ret.add(dest);
+    }
     ret.add(src);
     return ret;
   }
   
   public ArrayList<Register> getDests(){
     ArrayList<Register> ret = new ArrayList<Register>();
-    ret.add(dest);
+    if(name.equals("loadai")) {
+      ret.add(dest);
+    }
     return ret;
   }
 }

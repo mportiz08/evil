@@ -433,6 +433,7 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
             ArrayList<String> temp = new ArrayList<String>($reg.structfields.keySet());
             offset = 4 * temp.indexOf($rid.rstring);
           }
+          //System.out.println("LV: " + $reg.r + ", R: " + $r.sparcName);
           b.instructions.add(new AddressInstruction("loadai", $reg.r, $r, "@" + $rid.rstring, offset));
           
           if($reg.structfields != null && $reg.structfields.get($rid.rstring).isStruct()){
