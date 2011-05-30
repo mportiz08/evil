@@ -19,9 +19,9 @@ public class AddressInstruction extends Instruction
   public String toSparc()
   {
     if(name.equals("storeai")) {
-      return new String("st " + src.sparcName + ", [" + dest.sparcName + "-" + sparcOffset + "]");
+      return new String("st " + src.sparcName + ", [" + dest.sparcName + "+" + sparcOffset + "]");
     } else if(name.equals("loadai")) {
-      return new String("ld [" + src.sparcName + "-" + sparcOffset + "], " + dest.sparcName);
+      return new String("ld [" + src.sparcName + "+" + sparcOffset + "], " + dest.sparcName);
     } else {
       return new String("cheater");
     }

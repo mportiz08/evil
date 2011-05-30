@@ -1,0 +1,15 @@
+struct A {
+  int b;
+  int a;
+};
+
+fun main() int
+{
+  struct A a;
+  
+  a = new A;
+  read a.a;
+  print a.a endl;
+  a.a = a.a + 1;
+  return a.a;
+}
