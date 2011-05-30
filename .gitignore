@@ -17,3 +17,4 @@ antlr-3.3-complete.jar
 Mochi/
 *.s
 *.out
+benchmarks/

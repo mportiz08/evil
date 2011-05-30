@@ -205,7 +205,7 @@ assignment[HashMap<String, FuncType> functable, HashMap<String,StructType> struc
            {
              if($rv.rtype.isStruct())
              {
-               if(!((StructType)$lv.rtype).name.equals(((StructType)$rv.rtype).name))
+               if(!((StructType)$rv.rtype).name.equals("null") && !((StructType)$lv.rtype).name.equals(((StructType)$rv.rtype).name))
                {
                  EvilUtil.die("line " + $tnode.line + ": " + " types must match for an assignment.");
                }
@@ -375,7 +375,7 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
            {
              if($rv.rtype.isStruct())
              {
-               if(!((StructType)$lv.rtype).name.equals(((StructType)$rv.rtype).name))
+               if(!((StructType)$rv.rtype).name.equals("null") && !((StructType)$lv.rtype).name.equals(((StructType)$rv.rtype).name))
                {
                  EvilUtil.die("line " + $tnode.line + ": " + " types must match for an assignment.");
                }
@@ -430,7 +430,7 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
            {
              if($rv.rtype.isStruct())
              {
-               if(!((StructType)$lv.rtype).name.equals(((StructType)$rv.rtype).name))
+               if(!((StructType)$rv.rtype).name.equals("null") && !((StructType)$lv.rtype).name.equals(((StructType)$rv.rtype).name))
                {
                  EvilUtil.die("line " + $tnode.line + ": " + " types must match for an assignment.");
                }
@@ -593,7 +593,7 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
           }
           $rtype = $structtable.get($rid.rstring);
         })
-   |  NULL {/*System.out.println("random expression");*/ $rtype = new StructType();}
+   |  NULL {/*System.out.println("random expression");*/ $rtype = new StructType(); ((StructType)$rtype).name = "null";}
    |  ^(tnode=INVOKE {/*System.out.println("invoke: " + $tnode.text);*/} fid=id args=arguments[functable,structtable,vartable,rret]
          {
            if(!$functable.containsKey($fid.rstring))

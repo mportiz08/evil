@@ -21,7 +21,7 @@ public class StoreOutInstruction extends Instruction
   
   public String toSparc()
   {
-    return new String("mov " + this.reg.sparcName + ", " + sparcRegister.sparcName);
+    return new String("mov " + this.reg.sparcName + ", %o" + immediate);
   }
   
   public ArrayList<Register> getSources(){

@@ -135,6 +135,7 @@ params[HashMap<String, Register> regtable, FuncBlock rblock, HashMap<String, Str
           for(int i = 0; i < reglist.size(); i++){
              //$reglist.get(i).name = "\%i" + i;
              reglist.get(i).sparcName = "\%i" + i;
+             //System.out.println("creating a new input");
            }
         }
    ;

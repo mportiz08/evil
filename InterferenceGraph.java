@@ -42,7 +42,8 @@ public class InterferenceGraph
     ArrayList<String> availableColors = new ArrayList<String>(colors);
     availableColors.removeAll(neighborColors);
     String color = availableColors.get(0); // will have to change for spill later (ie if array is empty)
-    n.reg.sparcName = color;
+    if(!n.reg.sparcName.contains("%")) // <-- ?
+      n.reg.sparcName = color;
     
     // add colored node to graph
     nodes.add(n);

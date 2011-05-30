@@ -148,7 +148,7 @@ public class Block
     for(Register r : allregs)
     {
       if(!r.sparcName.contains("%"))
-      ig.addNode(new Node(r));
+        ig.addNode(new Node(r));
     }
   }
   
