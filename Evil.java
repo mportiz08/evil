@@ -123,6 +123,7 @@ public class Evil
           {
             System.out.println(b.getHeader(true));
             System.out.println(b.getInstructions(true));
+            System.out.println("  ret\n  restore");
           }
         }
         for(FuncBlock b : blist)
@@ -131,6 +132,7 @@ public class Evil
           {
             System.out.println(b.getHeader(true));
             System.out.println(b.getInstructions(true));
+            System.out.println("  ret\n  restore");
           }
         }
         System.out.println();

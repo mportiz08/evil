@@ -3,7 +3,6 @@ int a;
 fun addone(int i) void
 {
   a = i + 1;
-  return;
 }
 
 fun main() int

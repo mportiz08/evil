@@ -3,13 +3,22 @@ struct A {
   int a;
 };
 
-fun main() int
+struct A a;
+
+fun structfun() struct A
 {
-  struct A a;
+  struct A s;
+  s = new A;
+  s.a = 1;
+  s.b = 2;
+  return s;
+}
+
+fun main() int
+{ 
+  a = structfun();
+  print -a.a endl;
+  print a.b endl;
   
-  a = new A;
-  read a.a;
-  print a.a endl;
-  a.a = a.a + 1;
-  return a.a;
+  return a.a * a.b;
 }

@@ -629,11 +629,11 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
        )
    ;
    
-arguments[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret] returns [ArrayList<Type> arglist = null]
+arguments[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret] returns [ArrayList<Type> arglist = new ArrayList<Type>()]
    :  robbery=arg_list[functable,structtable,vartable,rret] {$arglist = $robbery.arglist;}
    ;
    
-arg_list[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret] returns [ArrayList<Type> arglist = null]
+arg_list[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable, HashMap<String,Type> vartable, Type rret] returns [ArrayList<Type> arglist = new ArrayList<Type>()]
    :  ARGS
    |  ^(ARGS {/*System.out.println("args");*/ $arglist = new ArrayList<Type>();} (arg=expression[functable,structtable,vartable,rret]
         {
