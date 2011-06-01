@@ -16,7 +16,7 @@ public class UnaryInstruction extends Instruction
   
   public String toSparc(){
     if(name.equals("del")){
-      return new String("mov " + reg.sparcName + ", " + sparcRegister.sparcName + "\n  call free\n  nop");
+      return new String("mov " + reg.sparcName + ", %o0\n  call free\n  nop");
     } else if(name.equals("print")) {
       sparcRegister.sparcName = "%o0";
       return new String("mov " + reg.sparcName + ", %o1\n  sethi %hi(.LLC0), " + sparcRegister.sparcName + "\n  or " + sparcRegister.sparcName + ", %lo(.LLC0), " + sparcRegister.sparcName + "\n  call printf\n  nop");
@@ -53,6 +53,8 @@ public class UnaryInstruction extends Instruction
     else if(name.equals("print") || name.equals("println")){
       ret.add(sparcRegister);
       ret.add(sparcRegister2);
+    } else if(name.equals("del")) {
+      ret.add(sparcRegister);
     }
     return ret;
   }

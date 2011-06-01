@@ -279,7 +279,7 @@ ret[HashMap<String, FuncType> functable, HashMap<String,StructType> structtable,
            {
              if($exp.rtype.isStruct())
              {
-               if(!((StructType)$rret).name.equals(((StructType)$exp.rtype).name))
+               if(!((StructType)$exp.rtype).name.equals("null") && !((StructType)$rret).name.equals(((StructType)$exp.rtype).name))
                {
                  EvilUtil.die("line " + $tnode.line + ": invalid return type.");
                }
@@ -616,7 +616,7 @@ expression [HashMap<String, FuncType> functable, HashMap<String,StructType> stru
              {
                if(((StructType)($args.arglist.get(i))).name != null)
                {
-                 if(!((StructType)($args.arglist.get(i))).name.equals(((StructType)(t)).name))
+                 if(!((StructType)$args.arglist.get(i)).name.equals("null") && !((StructType)($args.arglist.get(i))).name.equals(((StructType)(t)).name))
                  {
                    EvilUtil.die("line " + $fid.linenumber + ": mismatched types in function call to " + $fid.rstring);
                  }
