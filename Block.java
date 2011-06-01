@@ -141,17 +141,6 @@ public class Block
     return liveOut.addAll(ret);
   }
   
-  public void addAllNodes(InterferenceGraph ig)
-  {
-    // create nodes
-    TreeSet<Register> allregs = getAllRegs();
-    for(Register r : allregs)
-    {
-      if(!r.sparcName.contains("%"))
-        ig.addNode(new Node(r));
-    }
-  }
-  
   public void createInterGraph(InterferenceGraph ig)
   {
     //System.out.println("creating graph for " + name);
@@ -160,12 +149,18 @@ public class Block
     {
       for(Register dest : instructions.get(i).getDests())
       {
-        liveOut.remove(dest);
-        Node destnode = ig.nodeForRegister(dest);
-        //System.out.println("Register " + dest + " conflicts with " + liveOut + "in " + instructions.get(i));
-        for(Register r : liveOut)
+        if(!dest.name.contains("%") && !dest.sparcName.contains("%"))
         {
-          destnode.addEdgeTo(ig.nodeForRegister(r));
+          liveOut.remove(dest);
+          Node destnode = ig.nodeForRegister(dest);
+          //System.out.println("Register " + dest + " conflicts with " + liveOut + "in " + instructions.get(i));
+          for(Register r : liveOut)
+          {
+            if(!r.name.contains("%") && !r.sparcName.contains("%"))
+            {
+              destnode.addEdgeTo(ig.nodeForRegister(r));
+            }
+          }
         }
       }
       for(Register src : instructions.get(i).getSources())
@@ -173,18 +168,5 @@ public class Block
         liveOut.add(src);
       }
     }
-  }
-  
-  private TreeSet<Register> getAllRegs()
-  {
-    TreeSet<Register> allregs = new TreeSet<Register>(new RegisterComparator());
-    for(Instruction i : instructions)
-    {
-      //System.out.println("sdadsd " + i.toSparc() + " ASDASDASD");
-      allregs.addAll(i.getSources());
-      allregs.addAll(i.getDests());
-    }
-    allregs.addAll(liveOut);
-    return allregs;
   }
 }

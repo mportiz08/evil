@@ -83,11 +83,26 @@ public class RegisterAllocator
     return change;
   }
   
-  private void populateNodes(ArrayList<Block> blist, InterferenceGraph ig)
+  private TreeSet<Register> getAllRegs(ArrayList<Block> blist)
   {
+    TreeSet<Register> allRegs = new TreeSet<Register>(new RegisterComparator());
     for(Block b : blist)
     {
-       b.addAllNodes(ig);
+      for(Instruction i : b.instructions)
+      {
+        allRegs.addAll(i.getSources());
+        allRegs.addAll(i.getDests());
+      }
+    }
+    return allRegs;
+  }
+  
+  private void populateNodes(ArrayList<Block> blist, InterferenceGraph ig)
+  {
+    for(Register r : getAllRegs(blist))
+    {
+      /*System.out.println("adding " + r.sparcName + " as node in graph");*/
+      ig.nodes.add(new Node(r));
     }
   }
   
