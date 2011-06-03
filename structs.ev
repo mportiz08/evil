@@ -1,24 +1,22 @@
 struct A {
-  int b;
-  int a;
+  int x;
+  int y;
 };
 
-struct A a;
-
-fun structfun() struct A
-{
-  struct A s;
-  s = new A;
-  s.a = 1;
-  s.b = 2;
-  return s;
-}
+struct B {
+  struct A a;
+};
 
 fun main() int
 { 
-  a = structfun();
-  print -a.a endl;
-  print a.b endl;
+  struct B b;
+  b = new B;
+  b.a = new A;
   
-  return a.a * a.b;
+  read b.a.x;
+  read b.a.y;
+  print b.a.x;
+  print b.a.y;
+  
+  return 0;
 }

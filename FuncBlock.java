@@ -15,7 +15,7 @@ public class FuncBlock extends Block
   {
     String rstring = "";
     if(sparc){
-       int stackSize = 92 + (locals.size() * 4);
+      int stackSize = 112 + (locals.size() * 4 + ((locals.size() * 4) % 8));
        rstring += name + ":\n  !#PROLOGUE# 0\n  save %sp, -" + stackSize + ", %sp\n  !#PROLOGUE# 1\n";
     }
     else{
