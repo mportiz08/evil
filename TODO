@@ -1,2 +1,20 @@
-benchmarks
-recheck conditionals in ILOC
+BenchMarkishTopics
+bert
+biggest
+binaryConverter           <-- passing
+creativeBenchMarkName
+fact_sum                  <-- passing
+Fibonacci                 <-- passing
+GeneralFunctAndOptimize
+hailstone                 <-- passing
+hanoi_benchmark
+killerBubbles
+mile1                     <-- passing
+mixed
+OptimizationBenchmark
+primes
+programBreaker            <-- passing
+stats
+TicTac
+uncreativeBenchmark       <-- passing
+wasteOfCycles             <-- passing

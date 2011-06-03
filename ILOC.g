@@ -214,7 +214,7 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Str
    }
    :  ^(IF reg=expression[regtable, b, exit, structtable, vartable]{thenblock.name = "L" + c + "ifthen";} thenLast = block[regtable, thenblock, exit, structtable, vartable] {elseblock.name = "L" + c + "ifelse";}(elseLast = block[regtable, elseblock, exit, structtable, vartable])?)
        {
-          Register condition = new Register();
+          /*Register condition = new Register();
           b.instructions.add(new LoadInstruction("loadi", "1", condition));
           b.instructions.add(new ComparisonInstruction("comp", condition, $reg.r));
           continueblock.name = "L" + c + "cont";
@@ -228,7 +228,7 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Str
           else{
              b.successors.add(elseblock);
              elseblock.predecessors.add(b);
-             if(!$thenLast.rblock.name.substring(0, 4).equals("exit")){
+             if(!$elseLast.rblock.name.substring(0, 4).equals("exit")){
                $elseLast.rblock.successors.add(continueblock);
                continueblock.predecessors.add($elseLast.rblock);
                $elseLast.rblock.instructions.add(new JumpInstruction(continueblock.name));
@@ -236,12 +236,35 @@ conditional[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Str
              }
           }
           
-          if(!$thenLast.rblock.name.equals("exit")){
+          if(!$thenLast.rblock.name.substring(0, 4).equals("exit")){
             $thenLast.rblock.successors.add(continueblock);
             continueblock.predecessors.add($thenLast.rblock);
             $thenLast.rblock.instructions.add(new JumpInstruction(continueblock.name));
-          }
+          }*/
+          Register condition = new Register();
+          b.instructions.add(new LoadInstruction("loadi", "1", condition));
+          b.instructions.add(new ComparisonInstruction("comp", condition, $reg.r));
+          b.instructions.add(new BranchInstruction("cbreq", thenblock.name, elseblock.name));
+          continueblock.name = "L" + c + "cont";
+          b.successors.add(thenblock);
+          thenblock.predecessors.add(b);
           
+          $thenLast.rblock.successors.add(continueblock);
+          continueblock.predecessors.add($thenLast.rblock);
+          $thenLast.rblock.instructions.add(new JumpInstruction(continueblock.name));
+          
+          b.successors.add(elseblock);
+          elseblock.predecessors.add(b);
+          if(elseLast == null){
+            elseblock.successors.add(continueblock);
+            continueblock.predecessors.add(elseblock);
+            elseblock.instructions.add(new JumpInstruction(continueblock.name));
+          }
+          else{
+            $elseLast.rblock.successors.add(continueblock);
+            continueblock.predecessors.add($elseLast.rblock);
+            $elseLast.rblock.instructions.add(new JumpInstruction(continueblock.name));
+          }
        }
    ;
    
