@@ -91,11 +91,13 @@ function[HashMap<String, Register> regtable, HashMap<String, StructType> structt
          { 
            if($finalblk.rblock != null && $isVoid.isVoid)
            {
+             $finalblk.rblock.instructions.add(new RetInstruction());
              $finalblk.rblock.successors.add(exit);
              exit.predecessors.add($finalblk.rblock);
            }
            else if($isVoid.isVoid)
            {
+             rblock.instructions.add(new RetInstruction());
              rblock.successors.add(exit);
              exit.predecessors.add(rblock);
            }

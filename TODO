@@ -10,11 +10,11 @@ hailstone                 <-- passing
 hanoi_benchmark
 killerBubbles
 mile1                     <-- passing
-mixed
+mixed                     <-- passing
 OptimizationBenchmark
 primes
 programBreaker            <-- passing
 stats
-TicTac
+TicTac                    <-- passing
 uncreativeBenchmark       <-- passing
 wasteOfCycles             <-- passing
