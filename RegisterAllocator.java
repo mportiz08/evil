@@ -144,14 +144,14 @@ public class RegisterAllocator
     {
       colors.add(new String("%i" + i));
     }
+    for(int i = 5; i > -1; i--)
+    {
+      colors.add(new String("%o" + i));
+    }
     for(int i = 1; i < 6; i++)
     {
       colors.add(new String("%g" + i));
     }
-    /*for(int i = 0; i < 6; i++)
-    {
-      colors.add(new String("%o" + i));
-    }*/
     return colors;
   }
 }
