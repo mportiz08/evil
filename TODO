@@ -1,11 +1,11 @@
-BenchMarkishTopics
+BenchMarkishTopics        <-- passing
 bert                      <-- passing
 biggest                   <-- passing
 binaryConverter           <-- passing
 creativeBenchMarkName     <-- passing
 fact_sum                  <-- passing
 Fibonacci                 <-- passing
-GeneralFunctAndOptimize
+GeneralFunctAndOptimize   <-- passing
 hailstone                 <-- passing
 hanoi_benchmark           <-- passing
 killerBubbles             <-- passing

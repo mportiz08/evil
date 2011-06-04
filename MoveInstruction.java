@@ -4,12 +4,16 @@ public class MoveInstruction extends Instruction
 {
   public Register src;
   public Register dest;
+  public Register sparcRegister;
   
   public MoveInstruction(Register src, Register dest)
   {
     super("mov");
     this.src = src;
     this.dest = dest;
+    if(dest.global){
+       sparcRegister = new Register();
+    }
   }
   
   public String toSparc()
