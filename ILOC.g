@@ -289,6 +289,7 @@ loop[HashMap<String, Register> regtable, Block b, Block exit, HashMap<String, St
          expblock.instructions.add(new BranchInstruction("cbreq", execblock.name, continueblock.name));
          b.successors.add(expblock);
          expblock.predecessors.add(b);
+         b.instructions.add(new JumpInstruction(expblock.name));
          expblock.successors.add(execblock);
          execblock.predecessors.add(expblock);
          expblock.successors.add(continueblock);
