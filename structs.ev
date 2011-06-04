@@ -10,13 +10,14 @@ struct B {
 fun main() int
 { 
   struct B b;
-  b = new B;
-  b.a = new A;
-  
-  read b.a.x;
-  read b.a.y;
-  print b.a.x;
-  print b.a.y;
+  int i;
+  while(i < 400){
+   i = i + 1;
+   b = new B;
+   b.a = new A;
+   print b.a.x;
+   print b.a.y endl;
+  }
   
   return 0;
 }

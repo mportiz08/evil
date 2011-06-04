@@ -497,7 +497,9 @@ expression[HashMap<String, Register> regtable, Block b, Block exit, HashMap<Stri
          HashSet<String> temp = new HashSet<String>(structtable.get($rid.rstring).types.keySet());
          b.instructions.add(new NewInstruction($rid.rstring, temp, $r));
        }
-   |  NULL{/*?*/}
+   |  NULL{
+        b.instructions.add(new LoadInstruction("loadi", "0", $r));
+      }
    |  ^(INVOKE rid=id arguments[regtable, b, exit, structtable,vartable])
       {
         b.instructions.add(new CallInstruction($rid.rstring, $r));

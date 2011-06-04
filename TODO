@@ -1,20 +1,20 @@
 BenchMarkishTopics
-bert
+bert                      <-- passing
 biggest                   <-- passing
 binaryConverter           <-- passing
-creativeBenchMarkName
+creativeBenchMarkName     <-- passing
 fact_sum                  <-- passing
 Fibonacci                 <-- passing
 GeneralFunctAndOptimize
 hailstone                 <-- passing
-hanoi_benchmark
+hanoi_benchmark           <-- passing
 killerBubbles
 mile1                     <-- passing
 mixed                     <-- passing
 OptimizationBenchmark
 primes
 programBreaker            <-- passing
-stats
+stats                     <-- passing
 TicTac                    <-- passing
 uncreativeBenchmark       <-- passing
 wasteOfCycles             <-- passing
