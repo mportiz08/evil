@@ -1,0 +1,6 @@
+#!/bin/bash
+x=${1%.ev}
+y=$(basename $1 .ev)
+echo $y
+java Evil -dumpSPARC $x.ev > $x.s
+gcc -mcpu=v9 -g -o $y $x.s

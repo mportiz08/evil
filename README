@@ -1,0 +1,19 @@
+                                (    (     
+                                )\ ) )\ )  
+                   (    (   (  (()/((()/(  
+                   )\   )\  )\  /(_))/(_)) 
+                  ((_) ((_)((_)(_)) (_))   
+                  | __|\ \ / / |_ _|| |    
+                  | _|  \ V /   | | | |__  
+                  |___|  \_/   |___||____| 
+
+============================================================
+                   Evil Language Compiler
+                              by
+                Marcus Ortiz and Jeffrey Good
+============================================================
+
+1. Run make to build the compiler
+2. Compile using "evil <source file>"
+3. Run executable, which has the same name as the file (created in current working directory of step 2)
+     e.g. "evil benchmarks/mixed/mixed.ev" will create an exectuable named "mixed"
